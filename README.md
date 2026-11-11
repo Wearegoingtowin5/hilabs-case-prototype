@@ -1,6 +1,7 @@
-# HiLabs case prototype (synthetic data)
-Single-file static app. All people, NPIs, addresses and phone numbers are fictional. Outreach and downstream systems are simulated. Not an official HiLabs product.
+# MedCare Provider Portal (prototype)
 
-Run locally: open index.html in a browser. No build step, no login, no server.
+Single-file web app, no build step, no login. Fictional providers, NPIs and plans; data lives in memory and resets on reload.
 
-Case-day update: replace index.html, commit, push. The host redeploys automatically.
+Journeys: provider self-service (add by NPI lookup, edit, remove, CSV upload with AI validation), review and submit, plan review queue with AI recommendations, downstream delivery with a failure and retry, versioned audit trail, on-demand roster query.
+
+Deploy: static hosting (Vercel). Replace `index.html` to update.
