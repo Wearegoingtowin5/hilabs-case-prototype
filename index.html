@@ -231,6 +231,9 @@ tr.new td{background:#f3fbe8}.link{background:none;border:0;color:var(--blue);te
 .ws .row select{border:1.5px solid var(--bd);border-radius:10px;padding:7px 10px}
 
 .btn svg{width:16px;height:16px;vertical-align:-3px;margin-right:4px}
+
+.ofy{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.ofy span{background:#fff;border:1px solid #d7ceff;border-radius:10px;padding:6px 10px;font-size:.84rem;color:#33436f}.ofy em{display:block;font-style:normal;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#6a3dd0;font-weight:800}.mapr{margin:8px 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.86rem}
+@media (max-width:640px){.ofy{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -270,9 +273,9 @@ const dAdd = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); retu
 const dFmt = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 const iso = d => new Date(d).toISOString().slice(0, 10);
 const SPECS = ['Family Medicine', 'Internal Medicine', 'Pediatrics', 'Cardiology', 'Nurse Practitioner', 'Physician Assistant', 'OB-GYN', 'Dermatology'];
-const LOCS = ['Main clinic', 'Harbor annex'];
-const PLAN = 'Meridian Health Plan';
-const PRAC = { name: 'Riverside Family Practice', tin: '**-***4821', admin: 'Maya Fernandes', address: '410 Harbor Way, Tampa FL 33602' };
+const LOCS = ['Main clinic (Oak St)', 'Pine Ave, Suite 210'];
+const PLAN = 'Northwind Health Plan';
+const PRAC = { name: 'Riverbend Family Medicine', tin: '**-***4821', admin: 'Maya Fernandes', address: '88 Oak St, Tampa FL 33602' };
 
 /* synthetic state-board and NPPES registries */
 const BOARD = { 'FL-ME41001': 'active', 'FL-ME41002': 'active', 'FL-ME41003': 'expired', 'FL-ME41004': 'active', 'FL-ME41005': 'active', 'FL-ME41006': 'active', 'FL-APRN2201': 'active', 'FL-PA3301': 'active', 'FL-ME41009': 'active', 'FL-ME41010': 'active', 'FL-ME41011': 'active', 'FL-APRN2202': 'active', 'FL-ME41003R': 'active', 'FL-ME52001': 'active', 'FL-ME52002': 'active', 'FL-ME52003': 'expired', 'FL-ME52004': 'active', 'FL-ME52005': 'active', 'FL-ME52006': 'active' };
@@ -287,16 +290,16 @@ const NPPES = [
 const SYS = [['claims', 'Claims processing'], ['pa', 'Prior authorization'], ['care', 'Care coordination']];
 
 function seedProviders() {
-  const L = [['Dr. Elena Torres', 'Family Medicine', 'FL-ME41001', 20], ['Dr. Marcus Bell', 'Family Medicine', 'FL-ME41002', 35], ['Dr. Anil Rao', 'Internal Medicine', 'FL-ME41003', 70], ['Dr. Mei Zhang', 'Family Medicine', 'FL-ME41004', 130],
+  const L = [['Dr. Priya Nair', 'Family Medicine', 'FL-ME41001', 20], ['Dr. Marcus Webb', 'Internal Medicine', 'FL-ME41002', 35], ['Dr. Anil Rao', 'Internal Medicine', 'FL-ME41003', 70], ['Dr. Mei Zhang', 'Family Medicine', 'FL-ME41004', 130],
     ['Dr. Ravi Kapoor', 'Pediatrics', 'FL-ME41005', 12], ['Dr. Sofia Alvarez', 'Pediatrics', 'FL-ME41006', 48], ['Jordan Hale, NP', 'Nurse Practitioner', 'FL-APRN2201', 22], ['Tessa Brooks, PA-C', 'Physician Assistant', 'FL-PA3301', 91],
     ['Dr. Omar Siddiqui', 'Internal Medicine', 'FL-ME41009', 15], ['Dr. Lina Park', 'Family Medicine', 'FL-ME41010', 41], ['Dr. Henry Cole', 'Cardiology', 'FL-ME41011', 66], ['Nia Washington, NP', 'Nurse Practitioner', 'FL-APRN2202', 18]];
-  return L.map((x, i) => ({ npi: mkNpi('2000000' + p2(i)), name: x[0], spec: x[1], lic: x[2], loc: i % 4 === 3 ? 'Harbor annex' : 'Main clinic', phone: '813-555-01' + p2(40 + i), status: 'active', start: '2023-0' + (1 + i % 9) + '-01', lv: x[3], claimsSilent: i === 3 ? 120 : 5 + i }));
+  return L.map((x, i) => ({ npi: mkNpi('2000000' + p2(i)), name: x[0], spec: x[1], lic: x[2], loc: i % 4 === 3 ? 'Pine Ave, Suite 210' : 'Main clinic (Oak St)', phone: '813-555-01' + p2(40 + i), status: 'active', start: '2023-0' + (1 + i % 9) + '-01', lv: x[3], claimsSilent: 5 + i, flag: i === 1 ? 'moved' : null }));
 }
 function seedQueue() {
   return [
     { id: 'Q-2041', practice: 'Lakeside Pediatrics', kind: 'add', name: 'Dr. Tomas Reyes', fields: [['NPI', '—', mkNpi('300000007')], ['Specialty', '—', 'Pediatrics'], ['License', '—', 'FL-ME52005 (active)']], checks: [['pass', 'NPI check digit valid'], ['pass', 'License active per state board'], ['pass', 'No duplicate on roster']], conf: 94, status: 'review', age: 1, mine: false },
     { id: 'Q-2042', practice: 'Northgate Cardiology', kind: 'remove', name: 'Dr. Alan Pierce', fields: [['Status', 'Active', 'Terminated'], ['Effective', '—', dFmt(dAdd(BASE, -52))]], checks: [['warn', 'Termination date is 52 days in the past'], ['warn', 'Claims still received 18 days ago'], ['pass', 'Submitted by verified practice admin']], conf: 62, status: 'review', age: 2, mine: false },
-    { id: 'Q-2043', practice: 'Harbor Urgent Care', kind: 'update', name: 'Dr. Mia Cole', fields: [['Phone', '(813) 555 0177', '813-555-0177'], ['Location', 'Harbor annex', 'Main clinic']], checks: [['pass', 'Phone format normalised, same number'], ['pass', 'Location exists on plan record']], conf: 91, status: 'review', age: 0, mine: false }
+    { id: 'Q-2043', practice: 'Harbor Urgent Care', kind: 'update', name: 'Dr. Mia Cole', fields: [['Phone', '(813) 555 0177', '813-555-0177'], ['Location', 'Annex', 'Main clinic']], checks: [['pass', 'Phone format normalised, same number'], ['pass', 'Location exists on plan record']], conf: 91, status: 'review', age: 0, mine: false }
   ];
 }
 function fresh() {
@@ -324,6 +327,7 @@ function validate(c) {
     if (f('phone') && f('phone').replace(/\D/g, '').length !== 10) add('err', 'Phone must have 10 digits'); else if (f('phone')) add('pass', 'Phone format valid');
     if (f('lic')) { const b = BOARD[f('lic')]; if (b === 'active') add('pass', 'New license active per state board'); else if (b) add('err', 'New license is ' + b + ' per state board'); else add('err', 'New license not found at the state board'); }
     if (f('spec') && c.old && f('spec') !== c.old.spec) add('warn', 'Specialty change affects network adequacy and needs plan review');
+    if (c.fields && c.fields.some(f => /location/i.test(f[0]))) add('warn', 'New service location needs a plan site check');
     if (!out.length) add('pass', 'No risky changes detected');
   } else if (c.kind === 'remove') {
     const days = Math.round((BASE - new Date(f('eff'))) / 864e5);
@@ -346,22 +350,19 @@ function applyChange(c) {
   const by = c.mine ? 'Plan rules' : 'Plan reviewer';
   if (c.mine) {
     if (c.kind === 'add') S.providers.push({ npi: c.val.npi, name: c.name, spec: c.val.spec, lic: c.val.lic, loc: c.val.loc || 'Main clinic', phone: '813-555-0140', status: 'active', start: c.val.eff, lv: 0, claimsSilent: 0, isNew: true });
-    if (c.kind === 'update') { const p = S.providers.find(x => x.npi === c.pid); Object.assign(p, { spec: c.val.spec || p.spec, phone: c.val.phone || p.phone, loc: c.val.loc || p.loc, lic: c.val.lic || p.lic, lv: 0 }); }
+    if (c.kind === 'update') { const p = S.providers.find(x => x.npi === c.pid); Object.assign(p, { spec: c.val.spec || p.spec, phone: c.val.phone || p.phone, loc: c.val.addLoc ? p.loc + ' + ' + c.val.loc : (c.val.loc || p.loc), lic: c.val.lic || p.lic, lv: 0 }); }
     if (c.kind === 'remove') { const p = S.providers.find(x => x.npi === c.pid); p.status = 'termed'; p.end = c.val.eff; }
   }
   c.status = 'accepted'; log(by, 'Accepted ' + c.kind, c.name, c.fields.map(f => f[0] + ': ' + f[1] + ' → ' + f[2]).join('; ') + ' (' + c.practice + ')', true);
   c.ds = { claims: 'queued', pa: 'queued', care: 'queued' }; c.ver = S.ver;
-  if (c.kind === 'add' && c.mine && !S.failUsed) { c.failOnce = true; S.failUsed = true; }
+  if (c.mine && !S.failUsed && c.fields.some(f => /location/i.test(f[0]))) { c.failOnce = true; S.failUsed = true; }
   S.changes.unshift(c); push(c);
 }
-function push(c) {
-  const set = (k, v) => { c.ds[k] = v; log('Integration', 'Delivery ' + v, c.name, SYS.find(s => s[0] === k)[1], false); soft(); };
-  c.ds.claims = 'sending'; soft();
-  setTimeout(() => set('claims', 'delivered'), 700);
-  setTimeout(() => { c.ds.pa = 'sending'; soft(); }, 700);
-  setTimeout(() => { if (c.failOnce) { c.ds.pa = 'failed'; c.dsErr = 'The specialty "Pediatrics" has no taxonomy mapping (207Q00000X) in that system.'; log('Integration', 'Delivery failed', c.name, 'Prior authorization: taxonomy not mapped', false); soft(); } else set('pa', 'delivered'); }, 1500);
-  setTimeout(() => { c.ds.care = 'sending'; soft(); }, 1500);
-  setTimeout(() => set('care', 'delivered'), 2200);
+function push(c, from) {
+  from = from || 0; const set = (k, v) => { c.ds[k] = v; log('Integration', 'Delivery ' + v, c.name, SYS.find(x => x[0] === k)[1], false); soft(); };
+  const step = i => { if (i >= SYS.length) return; const k = SYS[i][0]; c.ds[k] = 'sending'; soft();
+    setTimeout(() => { if (k === 'claims' && c.failOnce) { c.ds[k] = 'failed'; c.dsErr = 'Claims rejected the new location: the service-location ID for Pine Ave, Suite 210 is missing.'; log('Integration', 'Delivery failed', c.name, 'Claims processing: service-location ID missing', false); soft(); return; } set(k, 'delivered'); step(i + 1); }, 750); };
+  step(from);
 }
 function soft() { if (['submissions', 'downstream', 'roster'].includes(ui.tab) && !ui.proc) render(); }
 function submitAll() {
@@ -389,8 +390,8 @@ function aiCard(c) {
 }
 
 /* ---------- views ---------- */
-const NAV = { provider: [['roster', 'Roster', 'roster'], ['submit', 'Review and submit', 'check'], ['submissions', 'Submissions', 'flow'], ['audit', 'Audit trail', 'clock']], plan: [['review', 'Review queue', 'list'], ['api', 'Roster query', 'code'], ['downstream', 'Downstream', 'send'], ['audit', 'Audit trail', 'clock']] };
-const PT = { roster: ['Provider portal', 'Your roster, always current'], submit: ['Provider portal', 'Review and submit'], submissions: ['Provider portal', 'Submissions and delivery'], audit: ['Compliance', 'Audit trail and versions'], review: ['Plan operations', 'Roster change review'], api: ['Plan operations', 'Query a roster on demand'], downstream: ['Plan operations', 'Delivery to downstream systems'] };
+const NAV = { provider: [['roster', 'Roster', 'roster'], ['submit', 'Review and submit', 'check'], ['submissions', 'Submissions', 'flow'], ['audit', 'Audit trail', 'clock']], plan: [['review', 'Exception queue', 'list'], ['downstream', 'Downstream', 'send'], ['audit', 'Audit trail', 'clock']] };
+const PT = { roster: ['Provider portal', 'Your roster, always current'], submit: ['Provider portal', 'Review and submit'], submissions: ['Provider portal', 'Submissions and delivery'], audit: ['Compliance', 'Audit trail and versions'], review: ['Plan operations', 'Exception queue: changes that need a person'], api: ['Plan operations', 'Query a roster on demand'], downstream: ['Plan operations', 'Delivery to downstream systems'] };
 const stB = s => ({ active: '<span class="badge b-ready">Active</span>', termed: '<span class="badge b-done">Terminated</span>', pending: '<span class="badge b-outreach">Pending</span>' }[s]);
 const kB = k => '<span class="badge ' + ({ add: 'b-ready', update: 'b-outreach', remove: 'b-bad' }[k]) + '">' + k.toUpperCase() + '</span>';
 const chk = ([s, m]) => '<li><span class="badge ' + (s === 'pass' ? 'b-ready' : s === 'warn' ? 'b-human' : 'b-bad') + '">' + (s === 'pass' ? 'Pass' : s === 'warn' ? 'Review' : 'Fix') + '</span> ' + esc(m) + '</li>';
@@ -400,9 +401,9 @@ const phead = k => '<div class="phead"><div class="eyebrow">' + PT[k][0] + '</di
 function healthItems() {
   const it = [];
   S.providers.forEach(p => { if (p.status !== 'active') return;
-    if (BOARD[p.lic] === 'expired') it.push({ pid: p.npi, title: p.name + ': license expired', why: 'The state board shows ' + p.lic + ' as expired. Claims may deny and the plan will flag this entry.', btn: 'Update license', act: 'hEdit' });
-    else if (p.claimsSilent >= 90) it.push({ pid: p.npi, title: p.name + ': no claims for ' + p.claimsSilent + ' days', why: 'This provider looks inactive at your practice. Confirm whether they have left so the plan stops listing them.', btn: 'Start removal', act: 'hRemove' }); });
-  if (!S.addrDone) it.push({ pid: null, title: 'Practice address differs from the plan record', why: 'Plan record: 410 Harbor Way Suite 2. Your portal profile: 410 Harbor Way. AI suggests a suite number update.', btn: 'Review update', act: 'hAddr' });
+    if (BOARD[p.lic] === 'expired') it.push({ pid: p.npi, title: p.name + ': license expired', onFile: 'License ' + p.lic + ' expired (state board)', yours: p.lic + ' listed as active', why: 'Claims may deny and the plan will flag this entry.', btn: 'Update license', act: 'hEdit' });
+    else if (p.flag === 'moved') it.push({ pid: p.npi, title: p.name + ': appears to have left your practice', onFile: 'Active at ' + PRAC.name, yours: 'Active (no end date)', why: 'The state board lists a new practice address from Oct 29 and no claims were filed here since Nov 3.', btn: 'Start removal', act: 'hRemove' }); });
+  if (!S.locDone) { const p = S.providers[0]; it.unshift({ pid: p.npi, title: p.name + ': second location is missing at the plan', onFile: 'Main clinic (Oak St) only', yours: 'Main clinic (Oak St) and Pine Ave, Suite 210', why: 'Your site list shows two locations, but ' + PLAN + ' has one on file.', btn: 'Add location', act: 'hLoc' }); }
   return it;
 }
 function vRoster() {
@@ -410,7 +411,7 @@ function vRoster() {
   const act = S.providers.filter(p => p.status === 'active');
   out += '<div class="row" style="margin-bottom:12px"><button class="btn primary" data-act="addForm">Add provider</button><button class="btn" data-act="csvOpen">' + svg('upload') + ' Upload roster file</button><span class="chips"><span>' + act.length + ' active</span><span>' + act.filter(p => p.lv <= 90).length + ' verified in 90 days</span><span>' + S.drafts.length + ' draft change' + (S.drafts.length === 1 ? '' : 's') + '</span></span></div>';
   if (ui.proc && ui.proc.key === 'health') out += procCard();
-  else if (ui.health === 'done') { const hi = healthItems(); out += hi.length ? '<div class="ai"><div class="aih"><span class="spark"></span><b>AI roster check: ' + hi.length + ' item' + (hi.length === 1 ? '' : 's') + ' need attention</b></div>' + hi.map((h, i) => '<div class="hitem"><div><b>' + esc(h.title) + '</b><div class="small muted">' + esc(h.why) + '</div></div><button class="btn sm primary" data-act="' + h.act + '" data-id="' + (h.pid || '') + '">' + h.btn + '</button></div>').join('') + '</div>' : '<div class="banner ban-ok">AI roster check: nothing needs attention. Your roster matches the state board and plan record.</div>'; }
+  else if (ui.health === 'done') { const hi = healthItems(); out += hi.length ? '<div class="ai"><div class="aih"><span class="spark"></span><b>AI roster check: ' + hi.length + ' item' + (hi.length === 1 ? '' : 's') + ' need attention</b></div>' + hi.map((h, i) => '<div class="hitem"><div><b>' + esc(h.title) + '</b><div class="small muted">' + esc(h.why) + '</div><div class="ofy"><span><em>On file at ' + PLAN.split(' ')[0] + '</em>' + esc(h.onFile) + '</span><span><em>Your roster</em>' + esc(h.yours) + '</span></div></div><button class="btn sm primary" data-act="' + h.act + '" data-id="' + (h.pid || '') + '">' + h.btn + '</button></div>').join('') + '</div>' : '<div class="banner ban-ok">AI roster check: nothing needs attention. Your roster matches the state board and plan record.</div>'; }
   if (ui.form) out += vForm();
   if (ui.csv) out += vCsv();
   const q = ui.q.trim().toLowerCase();
@@ -437,8 +438,8 @@ function vForm() {
   if (f.err) h += '<div class="banner ban-err" role="alert">' + esc(f.err) + '</div>';
   return h + '<div class="row" style="margin-top:10px"><button class="btn primary" data-act="formStage">Add to review and submit</button><span class="small muted">Nothing is sent to the plan until you submit.</span></div></div>';
 }
-function csvText() { return 'npi,name,specialty,license,start\n' + [[NPPES[0].npi, 'Dr. Hana Kim', 'Pediatrics', 'FL-ME52001'], [NPPES[1].npi, 'Dr. Samuel Ortega', 'Family Medicine', 'FL-ME52002'], [NPPES[3].npi, 'Dr. Neha Patel', 'Internal Medicine', 'FL-ME52004'], [NPPES[2].npi, 'Dr. Luis Barros', 'Internal Medicine', 'FL-ME52003'], [NPPES[5].npi.slice(0, 9) + ((+NPPES[5].npi[9] + 1) % 10), 'Dr. Tom Hall', 'Cardiology', 'FL-ME52006'], [S.providers[0].npi, 'Dr. Elena Torres', 'Family Medicine', 'FL-ME41001'], [NPPES[4].npi, 'Dr. Lucia Mendes', '', 'FL-ME52005']].map(r => r.concat('2026-11-15').join(',')).join('\n'); }
-function parseCsv(t) { const L = t.trim().split(/\r?\n/); const H = L.shift().split(',').map(x => x.trim().toLowerCase()); return L.map(l => { const c = l.split(','); const o = {}; H.forEach((h, i) => o[h] = (c[i] || '').trim()); return o; }); }
+function csvText() { return 'Clinician Name,NPI #,Specialty,State License,Start Date\n' + [['Dr. Hana Kim', NPPES[0].npi, 'Pediatrics', 'FL-ME52001'], ['Dr. Samuel Ortega', NPPES[1].npi, 'Family Medicine', 'FL-ME52002'], ['Dr. Neha Patel', NPPES[3].npi, 'Internal Medicine', 'FL-ME52004'], ['Dr. Luis Barros', NPPES[2].npi, 'Internal Medicine', 'FL-ME52003'], ['Dr. Tom Hall', NPPES[5].npi.slice(0, 9) + ((+NPPES[5].npi[9] + 1) % 10), 'Cardiology', 'FL-ME52006'], ['Dr. Priya Nair', S.providers[0].npi, 'Family Medicine', 'FL-ME41001'], ['Dr. Lucia Mendes', NPPES[4].npi, '', 'FL-ME52005']].map(r => r.concat('2026-11-15').join(',')).join('\n'); }
+function parseCsv(t) { const L = t.trim().split(/\r?\n/); const H = L.shift().split(',').map(x => x.trim()); const std = h => { const k = h.toLowerCase(); return /npi/.test(k) ? 'npi' : /name/.test(k) ? 'name' : /spec/.test(k) ? 'specialty' : /lic/.test(k) ? 'license' : /start|effective/.test(k) ? 'start' : null; }; const map = H.map(h => [h, std(h)]); const rows = L.filter(l => l.trim()).map(l => { const c = l.split(','); const o = {}; map.forEach((m, i) => { if (m[1]) o[m[1]] = (c[i] || '').trim(); }); return o; }); return { rows, map }; }
 function csvEval(rows) { return rows.map(r => { const c = validate({ kind: 'add', val: { npi: r.npi, lic: r.license, spec: r.specialty, eff: r.start || iso(BASE) } }); const errs = c.checks.filter(x => x[0] === 'err'); let fix = null, fixv = null;
   if (errs.some(e => /check digit/.test(e[1])) && /^\d{10}$/.test(r.npi)) { fixv = { npi: mkNpi(r.npi.slice(0, 9)) }; fix = 'Check digit corrected to ' + fixv.npi; }
   else if (errs.some(e => /Specialty/.test(e[1]))) { const n = NPPES.find(x => x.npi === r.npi); if (n) { fixv = { specialty: n.spec }; fix = 'Specialty filled from NPPES: ' + n.spec; } }
@@ -447,6 +448,7 @@ function vCsv() {
   const z = ui.csv; let h = '<div class="card formc"><div class="row"><h3 style="flex:1">Upload a roster file</h3><button class="btn sm" data-act="csvClose">Close</button></div>';
   if (ui.proc && ui.proc.key === 'csv') return h + procCard() + '</div>';
   if (!z.res) return h + '<p class="muted small">Columns: npi, name, specialty, license, start. AI maps the columns, checks every row and suggests fixes.</p><div class="row"><button class="btn primary" data-act="csvSample">Use sample file (roster_update.csv)</button><label class="btn">Choose a .csv file<input type="file" accept=".csv,text/csv" id="csvFile" style="display:none"></label></div>' + (z.err ? '<div class="banner ban-err" role="alert">' + esc(z.err) + '</div>' : '') + '</div>';
+  h += '<div class="mapr"><b>AI mapped your columns:</b> ' + (z.map || []).map(m => '<span class="badge ' + (m[1] ? 'b-ready' : 'b-done') + '">' + esc(m[0]) + ' → ' + (m[1] || 'ignored') + '</span>').join(' ') + '</div>';
   const ok = z.res.filter(x => x.ok).length, fixable = z.res.filter(x => !x.ok && x.fix).length;
   h += '<div class="banner ' + (ok === z.res.length ? 'ban-ok' : 'ban-warn') + '"><b>' + ok + ' of ' + z.res.length + ' rows are ready.</b> ' + (fixable ? fixable + ' can be fixed automatically. ' : '') + (z.res.length - ok - fixable ? (z.res.length - ok - fixable) + ' need your attention.' : '') + '</div>';
   h += '<div class="tw"><table><thead><tr><th>#</th><th>Provider</th><th>NPI</th><th>Result</th></tr></thead><tbody>' + z.res.map((x, i) => '<tr><td>' + (i + 1) + '</td><td><b>' + esc(x.r.name) + '</b><div class="small muted">' + esc(x.r.specialty || 'no specialty') + '</div></td><td class="small">' + esc(x.r.npi) + '</td><td>' + (x.ok ? '<span class="badge b-ready">Ready</span>' : (x.dup ? '<span class="badge b-done">Skipped</span> ' : '<span class="badge b-bad">Fix</span> ') + x.errs.map(e => esc(e[1])).join('; ')) + (x.fix && !x.ok ? '<div class="small" style="color:#6a3dd0"><b>AI suggestion:</b> ' + esc(x.fix) + '</div>' : '') + '</td></tr>').join('') + '</tbody></table></div>';
@@ -461,14 +463,14 @@ function vSubmit() {
   out += S.drafts.map(c => '<div class="card chg"><div class="row">' + kB(c.kind) + '<h3 style="flex:1;margin:0">' + esc(c.name) + '</h3>' + ring(c.conf) + '</div>' + diff(c) + '<ul class="chk">' + c.checks.map(chk).join('') + '</ul><div class="row"><span class="badge ' + (c.route === 'auto' ? 'b-ready' : c.route === 'review' ? 'b-human' : 'b-bad') + '">' + (c.route === 'auto' ? 'Likely accepted automatically' : c.route === 'review' ? 'Will go to plan review' : 'Fix before submitting') + '</span><button class="btn sm" data-act="discard" data-id="' + c.id + '">Discard</button></div></div>').join('');
   return out + '<div class="stickybar"><span>' + S.drafts.length + ' change' + (S.drafts.length === 1 ? '' : 's') + (blocked ? ' · ' + blocked + ' need a fix' : '') + '</span><button class="btn primary" data-act="submit" ' + (blocked ? 'disabled' : '') + '>Submit to ' + PLAN + '</button></div>';
 }
-function stepper(c) { const STEPS = ['Submitted', 'AI validated', c.status === 'accepted' ? 'Accepted' : c.status === 'info' ? 'Info requested' : c.status === 'rejected' ? 'Rejected' : 'Plan review', 'Delivered']; const idx = c.status === 'accepted' ? (SYS.every(s => c.ds[s[0]] === 'delivered') ? 4 : 3) : c.status === 'review' ? 2 : c.status === 'info' ? 2 : 2; return '<ol class="stp">' + STEPS.map((s, i) => '<li class="' + (i < idx ? 'done' : i === idx ? 'cur' : '') + '"><i></i>' + s + '</li>').join('') + '</ol>'; }
+function stepper(c) { const STEPS = ['Submitted', c.status === 'info' ? 'Info requested' : c.status === 'rejected' ? 'Rejected' : 'In review', 'Accepted', 'Live']; const live = c.status === 'accepted' && SYS.every(x => c.ds[x[0]] === 'delivered'); const idx = c.status === 'accepted' ? (live ? 4 : 2) : 1; return '<ol class="stp">' + STEPS.map((x, i) => '<li class="' + (i < idx ? 'done' : i === idx ? 'cur' : '') + '"><i></i>' + x + '</li>').join('') + '</ol>'; }
 function dsChips(c) { return '<div class="dsrow">' + SYS.map(([k, l]) => { const s = c.ds[k]; return '<span class="ds ds-' + s + '">' + (s === 'sending' ? '<span class="spinner"></span>' : s === 'delivered' ? '✓ ' : s === 'failed' ? '✕ ' : '') + l + ': ' + s + '</span>'; }).join('') + '</div>'; }
 function changeCard(c, plan) {
   let h = '<div class="card chg"><div class="row">' + kB(c.kind) + '<h3 style="flex:1;margin:0">' + esc(c.name) + '</h3><span class="small muted">' + esc(c.practice) + ' · ' + c.id + '</span></div>' + diff(c) + stepper(c);
   if (c.status === 'review') h += '<div class="banner ban-info small">Waiting for ' + PLAN + ' review' + (c.reviewWhy ? ': ' + esc(c.reviewWhy) : '') + '.</div>';
   if (c.status === 'info') h += '<div class="banner ban-warn small"><b>' + PLAN + ' asks:</b> ' + esc(c.ask) + '</div>' + (plan ? '' : '<button class="btn primary sm" data-act="respond" data-id="' + c.id + '">Confirm and resubmit</button>');
   if (c.status === 'rejected') h += '<div class="banner ban-err small">Rejected: ' + esc(c.rejWhy) + '</div>';
-  if (c.status === 'accepted') { h += dsChips(c); if (c.ds.pa === 'failed') h += '<div class="banner ban-err" role="alert"><b>Prior authorization rejected this record.</b> ' + esc(c.dsErr) + ' <div class="row" style="margin-top:6px"><button class="btn primary sm" data-act="fixPa" data-id="' + c.id + '">Map taxonomy and retry</button></div></div>'; }
+  if (c.status === 'accepted') { h += dsChips(c); if (c.ds.claims === 'failed') h += '<div class="banner ban-err" role="alert"><b>Claims processing rejected this change.</b> ' + esc(c.dsErr) + (plan ? '' : ' <div class="row" style="margin-top:6px"><button class="btn primary sm" data-act="fixDs" data-id="' + c.id + '">Add service-location ID and retry</button></div>') + '</div>'; }
   return h + '</div>';
 }
 function vSubmissions() {
@@ -479,6 +481,7 @@ function vSubmissions() {
   if (!all.length) return out + '<div class="card empty"><h3>No submissions yet</h3><p class="muted">After you submit changes, you can follow each one from validation to delivery in the plan’s claims, prior authorization and care coordination systems.</p></div>';
   return out + all.map(c => changeCard(c, false)).join('');
 }
+function sla(c) { const left = 2 - (c.age || 0); return '<span class="badge ' + (left <= 0 ? 'b-bad' : left === 1 ? 'b-human' : 'b-ready') + '">' + (left <= 0 ? 'SLA due today' : 'SLA: ' + left + ' business day' + (left > 1 ? 's' : '') + ' left') + '</span>'; }
 function vReview() {
   let out = phead('review');
   const q = S.queue.filter(c => c.status === 'review');
@@ -486,7 +489,7 @@ function vReview() {
   if (!ui.sel || !q.some(c => c.id === ui.sel)) ui.sel = q[0].id;
   const c = q.find(x => x.id === ui.sel);
   out += '<div class="split"><div class="inbox" role="listbox" aria-label="Review queue"><div class="inhead">' + q.length + ' to review</div>' + q.map(x => '<button class="irow ' + (x.id === ui.sel ? 'sel' : '') + '" role="option" aria-selected="' + (x.id === ui.sel) + '" data-act="pick" data-id="' + x.id + '"><span class="it"><b>' + esc(x.name) + '</b><small>' + esc(x.practice) + '</small><span>' + kB(x.kind) + '</span></span>' + ring(x.conf) + '</button>').join('') + '</div>';
-  out += '<section class="ws"><div class="eyebrow">Change ' + c.id + '</div><h2 style="margin:2px 0">' + esc(c.name) + '</h2><div class="small muted">' + esc(c.practice) + ' · submitted ' + (c.age ? c.age + ' day' + (c.age > 1 ? 's' : '') + ' ago' : 'today') + '</div>' + aiCard(c) + '<h3>Requested change</h3>' + diff(c) + '<h3>Checks run</h3><ul class="chk">' + c.checks.map(chk).join('') + '</ul><h3>Decision</h3><div class="row"><button class="btn primary" data-act="approve">Approve and send downstream</button><button class="btn" data-act="info">Request information</button><label class="small" for="rj">Reject reason</label><select id="rj"><option value="">Select…</option><option>Provider not in network</option><option>License issue</option><option>Duplicate request</option></select><button class="btn danger" data-act="reject">Reject</button></div>' + (ui.rjErr ? '<div class="banner ban-err" role="alert">' + ui.rjErr + '</div>' : '') + '</section></div>';
+  out += '<section class="ws"><div class="eyebrow">Change ' + c.id + '</div><h2 style="margin:2px 0">' + esc(c.name) + '</h2><div class="row"><span class="small muted">' + esc(c.practice) + ' · submitted ' + (c.age ? c.age + ' day' + (c.age > 1 ? 's' : '') + ' ago' : 'today') + '</span>' + sla(c) + '</div>' + aiCard(c) + '<h3>Requested change</h3>' + diff(c) + '<h3>Checks run</h3><ul class="chk">' + c.checks.map(chk).join('') + '</ul><h3>Decision</h3><div class="row"><button class="btn primary" data-act="approve">Approve and send downstream</button><button class="btn" data-act="info">Request information</button><label class="small" for="rj">Reject reason</label><select id="rj"><option value="">Select…</option><option>Provider not in network</option><option>License issue</option><option>Duplicate request</option></select><button class="btn danger" data-act="reject">Reject</button></div>' + (ui.rjErr ? '<div class="banner ban-err" role="alert">' + ui.rjErr + '</div>' : '') + '</section></div>';
   return out;
 }
 function vDownstream() {
@@ -495,7 +498,7 @@ function vDownstream() {
   return out + (S.changes.length ? S.changes.map(c => changeCard(c, true)).join('') : '') + hist;
 }
 function vApi() {
-  let out = phead('api') + '<div class="card"><div class="row"><label class="fld grow"><span>Practice or NPI</span><input id="apiq" value="' + esc(ui.apiq || PRAC.name) + '"></label><button class="btn primary" data-act="apiRun" style="margin-top:20px">Query roster</button></div><p class="small muted">GET /v1/rosters?practice=riverside&amp;as_of=now · returns the roster exactly as the practice last submitted and the plan accepted it.</p></div>';
+  let out = phead('api') + '<div class="card"><div class="row"><label class="fld grow"><span>Practice or NPI</span><input id="apiq" value="' + esc(ui.apiq || PRAC.name) + '"></label><button class="btn primary" data-act="apiRun" style="margin-top:20px">Query roster</button></div><p class="small muted">GET /v1/rosters?practice=riverbend&amp;as_of=now · returns the roster exactly as the practice last submitted and the plan accepted it.</p></div>';
   if (ui.proc && ui.proc.key === 'api') return out + procCard();
   if (ui.api) { const j = ui.api; out += '<div class="row" style="margin:10px 0"><span class="badge b-ready">Roster v' + j.version + '</span><span class="badge b-outreach">Last change ' + tm(j.as_of) + '</span><span class="badge b-ready">' + j.providers.filter(p => p.status === 'active').length + ' active</span></div><pre class="json" tabindex="0">' + esc(JSON.stringify(j, null, 2)) + '</pre><button class="btn sm" data-act="copyApi">Copy JSON</button>'; }
   return out;
@@ -505,6 +508,7 @@ function vAudit() {
   return out + '<div class="tw" style="max-height:70vh"><table><thead><tr><th>Ver.</th><th>When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Detail</th></tr></thead><tbody>' + S.audit.map(e => '<tr><td class="small">v' + e.v + '</td><td class="small">' + tm(e.t) + '</td><td>' + esc(e.actor) + '</td><td>' + esc(e.action) + '</td><td>' + esc(e.entity) + '</td><td class="small">' + esc(e.detail) + '</td></tr>').join('') + '</tbody></table></div>';
 }
 function render() {
+  $('.sidefoot').textContent = PRAC.name;
   const nav = NAV[ui.role]; if (!nav.some(n => n[0] === ui.tab)) ui.tab = nav[0][0];
   const cnt = { submit: S.drafts.length, review: S.queue.filter(c => c.status === 'review').length };
   $('#tabs').innerHTML = nav.map(([k, l, ic]) => '<button role="tab" id="tab-' + k + '" aria-selected="' + (ui.tab === k) + '" data-act="tab" data-id="' + k + '">' + svg(ic) + l + (cnt[k] ? '<span class="num">' + cnt[k] + '</span>' : '') + '</button>').join('');
@@ -528,8 +532,8 @@ document.addEventListener('click', e => {
     case 'addForm': ui.csv = null; ui.form = { mode: 'add', v: { eff: iso(BASE) }, msg: null }; break;
     case 'editForm': ui.csv = null; { const p = find(id); ui.form = { mode: 'edit', p, v: { spec: p.spec, loc: p.loc, phone: p.phone, lic: '' } }; } break;
     case 'hEdit': { const p = find(id); ui.form = { mode: 'edit', p, v: { spec: p.spec, loc: p.loc, phone: p.phone, lic: '' } }; break; }
-    case 'removeForm': case 'hRemove': { const p = find(id); ui.csv = null; ui.form = { mode: 'remove', p, v: { eff: iso(dAdd(BASE, a === 'hRemove' ? -45 : 0)), why: a === 'hRemove' ? 'Left the practice' : '' } }; break; }
-    case 'hAddr': S.addrDone = true; stage({ kind: 'update', pid: null, name: 'Practice location', fields: [['Address', '410 Harbor Way', '410 Harbor Way Suite 2, Tampa FL 33602']], val: {}, old: null }); toast('Address update added to Review and submit.'); break;
+    case 'removeForm': case 'hRemove': { const p = find(id); ui.csv = null; ui.form = { mode: 'remove', p, v: { eff: iso(dAdd(BASE, a === 'hRemove' ? -8 : 0)), why: a === 'hRemove' ? 'Left the practice' : '' } }; break; }
+    case 'hLoc': { const p = find(id); S.locDone = true; stage({ kind: 'update', pid: p.npi, name: p.name, old: p, val: { loc: 'Pine Ave, Suite 210', addLoc: true }, fields: [['Add location', '—', 'Pine Ave, Suite 210']] }); toast('Added to Review and submit.'); break; }
     case 'formClose': ui.form = null; break;
     case 'useNpi': ui.form.v.npi = id; ui.form.msg = null; break;
     case 'lookup': { const n = (ui.form.v.npi || '').trim(); if (!/^\d{10}$/.test(n)) { ui.form.msg = ['err', 'Enter a 10-digit NPI. Your entry was kept.']; break; } if (!npiValid(n)) { ui.form.msg = ['err', 'This NPI fails the check digit test. Check for a typo and try again.']; break; }
@@ -546,7 +550,7 @@ document.addEventListener('click', e => {
     case 'discard': S.drafts = S.drafts.filter(d => d.id !== id); toast('Draft discarded.'); break;
     case 'submit': submitAll(); return;
     case 'respond': { const c = S.queue.find(x => x.id === id); c.status = 'review'; c.ask = null; log(PRAC.admin, 'Responded to plan', c.name, 'Provider confirmed the information'); toast('Response sent. Back in plan review.'); break; }
-    case 'fixPa': { const c = S.changes.find(x => x.id === id); c.failOnce = false; c.ds.pa = 'sending'; log(PRAC.admin, 'Mapped taxonomy and retried', c.name, 'Pediatrics → 207Q00000X'); render(); setTimeout(() => { c.ds.pa = 'delivered'; c.dsErr = null; log('Integration', 'Delivery delivered', c.name, 'Prior authorization'); render(); toast('Prior authorization accepted the record.'); }, 900); return; }
+    case 'fixDs': { const c = S.changes.find(x => x.id === id); c.failOnce = false; c.dsErr = null; log(PRAC.admin, 'Added service-location ID and retried', c.name, 'Pine Ave, Suite 210 → SL-88210'); push(c, 0); toast('Retrying delivery with the service-location ID.'); break; }
     case 'pick': ui.sel = id; ui.rjErr = null; break;
     case 'aiApply': { const b = document.querySelector('.ws [data-act="' + t.dataset.do + '"]'); if (b) setTimeout(() => b.click(), 0); return; }
     case 'approve': { const c = S.queue.find(x => x.id === ui.sel); S.queue = S.queue.filter(x => x !== c); applyChange(c); toast(c.name + ' approved. Sending to downstream systems.'); break; }
@@ -558,7 +562,7 @@ document.addEventListener('click', e => {
   }
   render();
 });
-function runCsv(text) { try { const rows = parseCsv(text); if (!rows.length) throw 0; run('csv', 'AI is reading your file…', ['Mapping columns: npi, name, specialty, license, start', 'Checking ' + rows.length + ' rows against NPPES and the state board', 'Looking for duplicates and suggesting fixes'], 1600, () => { ui.csv.res = csvEval(rows); }); } catch (er) { ui.csv.err = 'The file has no data rows. Add at least one provider under the header row.'; render(); } }
+function runCsv(text) { try { const pc = parseCsv(text), rows = pc.rows; if (!rows.length) throw 0; ui.csv.map = pc.map; run('csv', 'AI is reading your file…', ['Mapping columns: npi, name, specialty, license, start', 'Checking ' + rows.length + ' rows against NPPES and the state board', 'Looking for duplicates and suggesting fixes'], 1600, () => { ui.csv.res = csvEval(rows); }); } catch (er) { ui.csv.err = 'The file has no data rows. Add at least one provider under the header row.'; render(); } }
 document.addEventListener('change', e => { if (e.target.id === 'csvFile') { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => runCsv(String(r.result)); r.readAsText(f); } else if (e.target.dataset.f && ui.form) { ui.form.v[e.target.dataset.f] = e.target.value; } });
 document.addEventListener('input', e => { if (e.target.dataset.f && ui.form) ui.form.v[e.target.dataset.f] = e.target.value; else if (e.target.id === 'q') { ui.q = e.target.value; if (ui.role === 'provider' && ui.tab !== 'roster') ui.tab = 'roster'; render(); } });
 render();

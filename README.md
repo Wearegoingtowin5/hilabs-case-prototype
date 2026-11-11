@@ -1,4 +1,4 @@
-# MedCare Provider Portal (prototype)
+# MedCare Roster Portal (prototype)
 
 Single-file web app, no build step, no login. Fictional providers, NPIs and plans; data lives in memory and resets on reload.
 
