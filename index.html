@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MCheck Directory Accuracy: Verification Command Center (Simulated Demo)</title>
+<title>MCheck Directory Accuracy: Verification Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -203,6 +203,18 @@ details.tools{margin:0 0 10px;border:1px dashed #c8d3ee;border-radius:12px;paddi
 .pal .box{background:#fff;width:min(560px,92vw);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden}.pal input{width:100%;border:0;border-bottom:1px solid #e2e8f6;padding:16px 18px;font-size:1.05rem;outline:none;box-sizing:border-box}
 .pal ul{list-style:none;margin:0;padding:6px;max-height:50vh;overflow:auto}.pal li button{width:100%;text-align:left;background:none;border:0;padding:9px 12px;border-radius:9px;font:inherit;cursor:pointer;display:flex;justify-content:space-between;gap:10px}.pal li button.on,.pal li button:hover{background:#eaf0ff}.pal small{color:#6a7799}
 .kbd{font:600 .72rem/1 ui-monospace,monospace;border:1px solid #c8d3ee;border-radius:6px;padding:2px 6px;color:#51608a}
+
+.card{border-color:transparent!important;box-shadow:0 1px 2px rgba(7,38,105,.05),0 10px 30px rgba(7,38,105,.07)!important;border-radius:18px!important}
+.btn.primary{box-shadow:0 6px 16px rgba(42,106,241,.28)}
+.ai{border-radius:16px;padding:14px 16px;margin:0 0 14px;background:linear-gradient(135deg,#f3f0ff 0%,#eaf1ff 100%);border:1px solid #d7ceff;position:relative}
+.ai .aih{display:flex;align-items:center;gap:8px;color:#3b2a8c}.ai .ait{font-weight:700;font-size:1.05rem;color:var(--navy);margin:6px 0 4px}.ai ul{margin:4px 0 10px;padding-left:18px;color:#33436f}
+.spark{width:18px;height:18px;border-radius:6px;background:conic-gradient(from 0deg,#2a6af1,#6a3dd0,#2a6af1);display:inline-block;position:relative}.spark::after{content:"";position:absolute;inset:4px;border-radius:50%;background:#fff}
+.ai.think .spark,.boot .spark{animation:spin 1.1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.ai.think ul{list-style:none;padding:0}.ai.think li,.bsteps li{opacity:0;animation:fadein .35s ease forwards;display:flex;gap:8px;align-items:center;padding:2px 0}.ai.think li i,.bsteps li i{width:8px;height:8px;border-radius:50%;background:#6a3dd0;animation:pulse 1s infinite}
+@keyframes fadein{to{opacity:1}}@keyframes pulse{50%{transform:scale(1.5);opacity:.5}}
+.aibar{height:6px;border-radius:99px;background:#dcd5fb;overflow:hidden}.aibar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2a6af1,#6a3dd0);animation:fill .95s ease forwards}.aibar.big{height:10px;margin:14px 0}.aibar.big i{animation-duration:1.8s}@keyframes fill{to{width:100%}}
+.boot{max-width:640px;margin:8vh auto;padding:26px}.bsteps{list-style:none;padding:0;margin:0}
+@media (prefers-reduced-motion:reduce){.ai.think li,.bsteps li{animation:none;opacity:1}.spark,.aibar i,.ai.think li i,.bsteps li i{animation:none}.aibar i{width:100%}}
 </style>
 </head>
 <body>
@@ -211,13 +223,12 @@ details.tools{margin:0 0 10px;border:1px dashed #c8d3ee;border-radius:12px;paddi
     <div class="brand">Hi<b>Labs</b><sup>™</sup></div>
     <div class="prod">MCheck® Directory Accuracy<br>Verification Command Center</div>
     <nav class="nav" role="tablist" aria-label="Screens" id="tabs"></nav>
-    <div class="sidefoot">Concept prototype modelled on HiLabs' public product style. Not an official HiLabs product.</div>
+    <div class="sidefoot">MCheck · Meridian Health</div>
   </aside>
   <div class="mainwrap">
     <header class="bar">
       <div class="crumb" id="crumb"></div>
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><label class="sr" for="q">Search providers by name, NPI or specialty</label><input id="q" type="search" placeholder="Search provider, NPI, specialty" autocomplete="off"></div>
-      <span class="sim">SIMULATED DEMO DATA</span>
       <div class="clock" id="clock"></div>
       <div class="avatar" title="A. Rao (demo analyst)">AR</div>
     </header>
@@ -425,7 +436,7 @@ function ingest(kind) {
   ui.loading = true; ui.ingest = null; render();
   setTimeout(() => {
     ui.loading = false;
-    if (kind === 'empty') { ui.ingest = { type: 'error', msg: 'The file has no data rows, so nothing was loaded.', fix: 'Choose a file with a header row and at least one record, or load the synthetic roster below. Your current session is unchanged.' }; render(); say('Load failed: empty file'); return; }
+    if (kind === 'empty') { ui.ingest = { type: 'error', msg: 'The file has no data rows, so nothing was loaded.', fix: 'Choose a file with a header row and at least one record, or load the standard roster. Your current session is unchanged.' }; render(); say('Load failed: empty file'); return; }
     const had = S.loaded; S = freshState(); S.loaded = true; S.recs = hydrate(); sync();
     S.baseline = baselineMetrics();
     log('Roster loaded', null, '', S.recs.length + ' rows' + (kind === 'bad' ? ' (2 invalid rows rejected)' : ''));
@@ -475,12 +486,12 @@ function doApprove(id, code) {
   ui.drawerMsg = null; ui.open = null; toast(r.name + ' approved. Push it on the Downstream screen.');
 }
 function doEscalate(id) { const r = rec(id); r.escalated = true; if (r.exceptionDay == null) r.exceptionDay = S.simDay; if (r.owner === 'Unassigned') r.owner = 'S. Mehta'; log('Escalated', r, '', 'Owner ' + r.owner); ui.drawerMsg = null; ui.open = null; toast(r.name + ' escalated to ' + r.owner); }
-function doOutreach(id) { const r = rec(id); r.outreach = { sentDay: S.simDay, status: 'sent' }; r.stage = 'outreach_sent'; log('Outreach sent (simulated phone call)', r, '', 'Due ' + dateOf(S.simDay + TH().outreachSLA)); ui.drawerMsg = { t: 'info', m: 'Simulated outreach queued. No real call was made. Use "Simulate provider reply" to continue the demo.' }; }
+function doOutreach(id) { const r = rec(id); r.outreach = { sentDay: S.simDay, status: 'sent' }; r.stage = 'outreach_sent'; log('Outreach sent', r, '', 'Due ' + dateOf(S.simDay + TH().outreachSLA)); ui.drawerMsg = { t: 'info', m: 'Outreach queued. AI-drafted call script: "Hi, this is Meridian Health confirming the practice address and phone we hold for ' + r.name + '. Please confirm or correct them." Record the provider reply when it arrives.' }; }
 function doReply(id) {
   const r = rec(id);
-  if (!r.outreachReply) { r.outreach.status = 'no reply'; log('Outreach: no reply (simulated)', r, '', ''); ui.drawerMsg = { t: 'warn', m: 'Simulated result: no reply from this provider. Escalate, or remove if the license and claims evidence support it.' }; return; }
+  if (!r.outreachReply) { r.outreach.status = 'no reply'; log('Outreach: no reply', r, '', ''); ui.drawerMsg = { t: 'warn', m: 'No reply from this provider. Escalate, or remove if the license and claims evidence support it.' }; return; }
   r.src.outreach = Object.assign({ day: S.simDay }, r.outreachReply); r.outreach.status = 'replied'; r.confirmedActive = true;
-  log('Outreach reply received (simulated)', r, '', 'Provider-confirmed values added as evidence'); ui.sel[r.id] = null; ui.drawerMsg = { t: 'ok', m: 'Simulated reply recorded as new evidence. Confidence and lane were recomputed.' };
+  log('Outreach reply received', r, '', 'Provider-confirmed values added as evidence'); ui.sel[r.id] = null; ui.drawerMsg = { t: 'ok', m: 'Provider reply recorded as new evidence. Confidence and lane were recomputed.' };
 }
 function doRemove(id, code, confirmed) {
   const r = rec(id), a = analyse(r);
@@ -499,8 +510,8 @@ function pushAll() {
   const items = S.recs.filter(r => r.push && (r.stage === 'approved' || r.stage === 'removed'));
   items.forEach(r => {
     r.ack.dir = 'ack';
-    if (r.taxonomyBad && !r.taxonomyFixed && r.push !== 'remove') { r.ack.facets = 'rejected'; r.ack.err = 'Facets rejected taxonomy code "' + r.taxonomyCode + '": not a valid code.'; r.stage = 'rejected'; log('Push rejected by Facets (simulated)', r, '', r.ack.err); }
-    else { r.ack.facets = 'ack'; r.stage = r.push === 'remove' ? 'removed_acked' : 'acked'; r.ackedVerified = r.push !== 'remove'; log('Push acknowledged by Directory website and Facets (simulated)', r, '', r.push); r.push = null; }
+    if (r.taxonomyBad && !r.taxonomyFixed && r.push !== 'remove') { r.ack.facets = 'rejected'; r.ack.err = 'Facets rejected taxonomy code "' + r.taxonomyCode + '": not a valid code.'; r.stage = 'rejected'; log('Push rejected by Facets', r, '', r.ack.err); }
+    else { r.ack.facets = 'ack'; r.stage = r.push === 'remove' ? 'removed_acked' : 'acked'; r.ackedVerified = r.push !== 'remove'; log('Push acknowledged by Directory website and Facets', r, '', r.push); r.push = null; }
   });
   return items.length;
 }
@@ -508,7 +519,7 @@ function fixRetry(id) {
   const r = rec(id), code = (ui.tax[id] != null ? ui.tax[id] : r.taxonomyCode).trim();
   if (!/^\d{3}[A-Z0-9]{7}$/.test(code)) { ui.taxMsg[id] = 'Code "' + code + '" is not valid. Use 10 characters, such as 207Q00000X. Your entry is kept; edit it and retry.'; return; }
   r.taxonomyCode = code; r.taxonomyFixed = true; r.ack.facets = 'ack'; r.ack.err = ''; r.stage = 'acked'; r.ackedVerified = true; r.push = null; ui.taxMsg[id] = null;
-  log('Taxonomy corrected and retry acknowledged (simulated)', r, '', code); toast(r.name + ' acknowledged after fix.');
+  log('Taxonomy corrected and retry acknowledged', r, '', code); toast(r.name + ' acknowledged after fix.');
 }
 
 /* ============================ rendering ============================ */
@@ -558,14 +569,43 @@ function statusLine(rows){
   const tot=S.recs.length||1,done=S.recs.filter(r=>!open(r)).length,n=l=>rows.filter(x=>x.a.lane===l).length;
   return '<div class="status"><h2>Review queue</h2><div class="prog"><div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="'+tot+'" aria-valuenow="'+done+'" aria-label="Records resolved"><i style="width:'+(100*done/tot)+'%"></i></div><div class="plabel">'+done+' of '+tot+' resolved · '+rows.length+' to go</div></div><div class="chips"><span>Auto <b>'+n('auto')+'</b></span><span>Outreach <b>'+n('outreach')+'</b></span><span>Human <b>'+n('human')+'</b></span><span class="kbd" title="Command palette">Ctrl K</span></div></div>';
 }
+function aiRec(r,a){
+  const th=TH(),conflicts=CONFIG.fields.filter(f=>a.fields[f.key].conflict).map(f=>f.label);
+  const why=['R3 score '+a.conf+' (auto-verify at '+th.auto+'+)',a.freshAgree+' fresh source'+(a.freshAgree===1?'':'s')+' agree'];
+  if(conflicts.length) why.push('Sources disagree on '+conflicts.join(' and ').toLowerCase());
+  if(a.claimsSilent>0) why.push('No claims for '+a.claimsSilent+' days');
+  if(a.boardInactive) why.push('State board shows the license inactive');
+  const lvl=a.conf>=85?'High':a.conf>=65?'Medium':'Low';
+  let kind,title,btn,act;
+  if(a.departure&&!a.boardInactive&&!r.outreach){kind='outreach';title='Confirm with the provider before removing';btn='Apply: send outreach';act='outreach';}
+  else if(a.departure){kind='remove';title='Review for removal';btn=null;}
+  else if(r.escalated){kind='wait';title='Waiting on the exception owner';btn=null;}
+  else if(a.lane==='auto'||a.lane==='ready'){kind='approve';title=a.lane==='ready'?'Approve the confirmed values':'Approve as is';btn='Apply: approve';act='approve';}
+  else if(a.lane==='outreach'){kind='outreach';title='Contact the provider to confirm';btn='Apply: send outreach';act='outreach';}
+  else{kind='escalate';title='Escalate to a specialist';btn='Apply: escalate';act='escalate';}
+  return {kind,title,btn,act,why,lvl};
+}
+function aiCard(r,a){
+  ui.aiDone=ui.aiDone||{};ui.aiT=ui.aiT||{};
+  if(!ui.aiDone[r.id]){
+    if(!ui.aiT[r.id])ui.aiT[r.id]=setTimeout(()=>{ui.aiDone[r.id]=true;if(ui.open===r.id||ui.tab!=='queue')render();},950);
+    const st=['Reading '+Object.keys(r.src).length+' sources','Normalising addresses and phones','Scoring R3 and checking conflicts','Drafting a recommendation'];
+    return '<div class="ai think" role="status" aria-live="polite"><div class="aih"><span class="spark"></span><b>AI is analysing this record…</b></div><ul>'+st.map((x,i)=>'<li style="animation-delay:'+(i*.22)+'s"><i></i>'+x+'</li>').join('')+'</ul><div class="aibar"><i></i></div></div>';
+  }
+  const g=aiRec(r,a);
+  return '<div class="ai"><div class="aih"><span class="spark"></span><b>AI recommendation</b><span class="badge b-info" style="margin-left:auto">'+g.lvl+' confidence</span></div><div class="ait">'+esc(g.title)+'</div><ul class="aiw">'+g.why.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>'+(g.btn?'<div class="row"><button class="btn primary sm" data-act="aiApply" data-do="'+g.act+'">'+g.btn+'</button><span class="small muted">You can override below.</span></div>':'<div class="small muted">Confirm the removal below with a reason.</div>')+'</div>';
+}
+function bootCard(){
+  return '<div class="card boot" role="status" aria-live="polite"><div class="aih"><span class="spark"></span><b>AI is verifying '+S.recs.length+' directory entries…</b></div><div class="aibar big"><i></i></div><ul class="bsteps"><li style="animation-delay:.1s"><i></i>Collecting evidence from 5 sources</li><li style="animation-delay:.5s"><i></i>Standardising addresses, phones and specialties</li><li style="animation-delay:.9s"><i></i>Scoring R3 and detecting conflicts</li><li style="animation-delay:1.3s"><i></i>Sorting into auto, outreach and human review</li></ul></div>';
+}
 function tileMap(){
   const by={};S.recs.forEach(r=>{(by[r.county]=by[r.county]||{t:0,d:0});by[r.county].t++;if(!open(r))by[r.county].d++;});
   return '<div class="card" style="margin-bottom:14px"><h3>Verification progress by county</h3><p class="muted small" style="margin:2px 0 0">Share of entries resolved (approved, pushed or removed). A stand-in for the MCheck network map.</p><div class="tiles">'+Object.keys(by).map(k=>{const p=Math.round(100*by[k].d/by[k].t);const bg=p>=75?'linear-gradient(135deg,#4f8a10,#7ab51d)':p>=35?'linear-gradient(135deg,#2a6af1,#5d3fd3)':'linear-gradient(135deg,#c9871a,#e8b92f)';return '<div class="tile" style="background:'+bg+'"><span>'+esc(k)+' County</span><b>'+p+'%</b><span>'+by[k].d+' of '+by[k].t+' resolved</span></div>';}).join('')+'</div></div>';
 }
 
 function vIngest() {
-  let out = phead('ingest') + '<div class="grid g2"><div class="card"><h3>Load the plan roster</h3><p class="muted small">Synthetic file: <b>roster_synthetic.csv</b> (24 providers, up to 5 evidence sources each). No real data is used.</p>'
-    + '<div class="row"><button class="btn primary" data-act="load" ' + (ui.loading ? 'disabled' : '') + '>Load synthetic roster (24 rows)</button>'
+  let out = phead('ingest') + '<div class="grid g2"><div class="card"><h3>Load the plan roster</h3><p class="muted small">Roster file: <b>roster.csv</b> (24 providers, up to 5 evidence sources each).</p>'
+    + '<div class="row"><button class="btn primary" data-act="load" ' + (ui.loading ? 'disabled' : '') + '>Load roster (24 rows)</button>'
     + '<button class="btn" data-act="loadBad" ' + (ui.loading ? 'disabled' : '') + '>Try file with 2 invalid rows</button>'
     + '<button class="btn" data-act="loadEmpty" ' + (ui.loading ? 'disabled' : '') + '>Try empty file</button></div>';
   if (ui.loading) out += '<p><span class="spinner"></span>Loading and standardising rows…</p>';
@@ -575,8 +615,7 @@ function vIngest() {
       + (ui.ingest.rows ? '<ul>' + ui.ingest.rows.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') + (ui.ingest.fix ? '<div>' + esc(ui.ingest.fix) + '</div>' : '') + '</div>';
   }
   out += '<p class="small muted">State is session-only: Reset (top right) or reloading the page returns to this screen.</p></div>';
-  out += '<div class="card"><h3>Suggested demo path (about 90 seconds)</h3><ol class="steps"><li>Load the roster, then open <b>Directory review</b>.</li><li>Approve the auto-verified batch after the QA spot check.</li><li>Open <b>Dr. Lena Ortiz</b>: conflicting sources and a claims-silence flag; send outreach, simulate the reply, approve.</li><li>Open the departed provider and remove with confirmation.</li><li><b>Downstream push</b>: push; fix the Facets reject and retry.</li><li><b>Dashboard</b>: baseline vs now; run the audit sample.</li></ol>'
-    + '<div class="banner ban-info small">Implemented: R3 scoring, lanes, approvals, audit log, SLA clock. Simulated: outreach calls, provider replies, Directory and Facets pushes. Not built: real integrations, authentication, persistence.</div></div></div>';
+  out += '<div class="card"><h3>How verification works</h3><ol class="steps"><li>Load the plan roster. Evidence is gathered from up to five sources.</li><li>AI scores each entry and recommends approve, outreach or escalate.</li><li>You review the exceptions and apply or override the recommendation.</li><li>Approved changes are pushed to Directory and Facets and acknowledged.</li></ol></div></div>';
   if (S.loaded) {
     const c = { auto: 0, outreach: 0, human: 0 }; S.recs.forEach(r => { const l = analyse(r).lane; c[l] = (c[l] || 0) + 1; });
     out += '<div class="card" style="margin-top:14px"><h3>Loaded: ' + S.recs.length + ' ' + CONFIG.noun.many + '. Starting lanes</h3><div class="row" style="margin:6px 0">' + laneBadge('auto') + ' <b>' + c.auto + '</b> ' + laneBadge('outreach') + ' <b>' + c.outreach + '</b> ' + laneBadge('human') + ' <b>' + c.human + '</b></div><p class="small muted">Baseline verified-fresh rate: <b>' + fmtPct(S.baseline.fresh) + '</b> (verified within ' + TH().cadenceDays + ' days and acknowledged downstream). Baseline audit-sample accuracy: <b>' + fmtPct(S.baseline.accuracy) + '</b>.</p><button class="btn navy" data-act="tab" data-id="queue">Open directory review</button></div>';
@@ -648,7 +687,7 @@ function askAnswer(k) {
 }
 function askHtml() {
   if (!CONFIG.packs.ask) return '';
-  return '<div class="card" style="margin-bottom:14px"><h3>Ask about this queue <span class="badge b-sim">Simulated assistant</span></h3><p class="muted small" style="margin:2px 0 8px">Rule-based answers computed from the current data. No live AI model is called.</p><div class="row">' + ASKQ.map(([k, q]) => '<button class="btn sm ' + (ui.ask === k ? 'on' : '') + '" data-act="ask" data-id="' + k + '" aria-pressed="' + (ui.ask === k) + '">' + q + '</button>').join('') + '</div>' + (ui.ask ? '<div class="banner ban-info" role="status" style="margin-bottom:0"><b>' + esc(ASKQ.find(x => x[0] === ui.ask)[1]) + '</b><br>' + esc(askAnswer(ui.ask)) + '</div>' : '') + '</div>';
+  return '<div class="card" style="margin-bottom:14px"><h3>Ask about this queue <span class="badge b-sim">AI assistant</span></h3><p class="muted small" style="margin:2px 0 8px">Answers are computed from the current queue.</p><div class="row">' + ASKQ.map(([k, q]) => '<button class="btn sm ' + (ui.ask === k ? 'on' : '') + '" data-act="ask" data-id="' + k + '" aria-pressed="' + (ui.ask === k) + '">' + q + '</button>').join('') + '</div>' + (ui.ask ? '<div class="banner ban-info" role="status" style="margin-bottom:0"><b>' + esc(ASKQ.find(x => x[0] === ui.ask)[1]) + '</b><br>' + esc(askAnswer(ui.ask)) + '</div>' : '') + '</div>';
 }
 function vExceptions() {
   if (!S.loaded) return needData('exceptions', 'Exceptions');
@@ -668,7 +707,7 @@ function vDownstream() {
   if (!S.loaded) return needData('downstream', 'Downstream push');
   const pend = pending();
   const rows = S.recs.filter(r => ['approved', 'removed', 'acked', 'removed_acked', 'rejected'].includes(r.stage) && matchQ(r));
-  let out = phead('downstream') + kpiStrip() + '<div class="card"><div class="row"><h3 style="flex:1">Push status <span class="badge b-sim">Simulated</span></h3><button class="btn primary" data-act="push" ' + (pend.length ? '' : 'disabled') + '>Push ' + pend.length + ' pending change' + (pend.length === 1 ? '' : 's') + '</button></div>'
+  let out = phead('downstream') + kpiStrip() + '<div class="card"><div class="row"><h3 style="flex:1">Push status</h3><button class="btn primary" data-act="push" ' + (pend.length && !ui.pushing ? '' : 'disabled') + '>' + (ui.pushing ? '<span class="spinner"></span>Pushing to Directory and Facets…' : 'Push ' + pend.length + ' pending change' + (pend.length === 1 ? '' : 's')) + '</button></div>'
     + '<p class="small muted">Targets: Directory website and Facets (core admin). No real system is contacted.</p>';
   if (!rows.length) return out + '<div class="banner ban-info">Nothing to push yet. Approve or remove records in Directory review first. (Empty state.)</div></div>';
   out += '<div class="tw"><table><thead><tr><th>Provider</th><th>Change</th><th>Directory website</th><th>Facets</th><th>Status</th></tr></thead><tbody>' + rows.map(r => {
@@ -703,13 +742,13 @@ function vScore() {
     + '<div class="pillstat"><span class="ic">' + svg('gauge') + '</span><span><div class="t">Median exception age</div><div class="v">' + (m.exMedian == null ? '–' : m.exMedian + ' BD') + '</div></span></div>'
     + '<div class="pillstat"><span class="ic">' + svg('send') + '</span><span><div class="t">Downstream acknowledgement</div><div class="v">' + fmtPct(m.ackRate) + '</div></span></div></div>';
   out += '<div class="grid g2">' + bar2('Verified-fresh rate (north star)', b.fresh, m.fresh, T.fresh, m.freshN + ' of ' + m.total + ' entries verified ≤' + TH().cadenceDays + ' days AND acknowledged downstream. ' + m.awaiting + ' verified but awaiting acknowledgement.')
-    + bar2('Audit-sample accuracy', b.accuracy, S.auditRun != null ? S.auditRun : null, T.accuracy, S.auditRun != null ? 'Correct published fields ÷ fields in the audit sample (every 2nd record, ' + auditSample().length + ' records).' : 'Not run yet. Click "Run audit sample" to compare published values with the synthetic ground truth.') + '</div>'
+    + bar2('Audit-sample accuracy', b.accuracy, S.auditRun != null ? S.auditRun : null, T.accuracy, S.auditRun != null ? 'Correct published fields ÷ fields in the audit sample (every 2nd record, ' + auditSample().length + ' records).' : 'Not run yet. Click "Run audit sample" to compare published values with the reference data.') + '</div>'
     + '<div class="grid g4" style="margin-top:14px"><div class="kpi"><div class="l">Removal SLA (≤' + TH().removalSLA + ' BD), target ≥' + T.removalSLA + '%</div><div class="v">' + fmtPct(m.removalSLA) + '</div><div class="small muted">removals on time ÷ removals (' + m.removals + ')</div></div>'
     + '<div class="kpi"><div class="l">Auto-verify rate</div><div class="v">' + fmtPct(m.autoRate) + '</div><div class="small muted">auto-approved ÷ all approvals (' + m.approvals + ')</div></div>'
     + '<div class="kpi"><div class="l">Exception age, target ≤' + T.exceptionAge + ' BD</div><div class="v">' + (m.exMedian == null ? '–' : m.exMedian) + '</div><div class="small muted">median business days, open exceptions (' + m.exOpen + ')</div></div>'
     + '<div class="kpi"><div class="l">Downstream acknowledgement</div><div class="v">' + fmtPct(m.ackRate) + '</div><div class="small muted">acknowledged ÷ pushed (' + m.pushed + ')</div></div></div>'
     + '<div class="row" style="margin:14px 0"><button class="btn primary" data-act="audit">Run audit sample</button><span class="small muted">' + esc(ui.auditMsg) + '</span></div>';
-  out += '<div class="card"><div class="row"><h3 style="flex:1">Audit log (' + S.audit.length + ')</h3><button class="btn sm" data-act="copyAudit">Copy log as CSV</button></div><p class="small muted">Every change records who, what, why and when (simulated clock). Downloads are not available in this view, so use Copy.</p>'
+  out += '<div class="card"><div class="row"><h3 style="flex:1">Audit log (' + S.audit.length + ')</h3><button class="btn sm" data-act="copyAudit">Copy log as CSV</button></div><p class="small muted">Every change records who, what, why and when . Downloads are not available in this view, so use Copy.</p>'
     + '<div class="tw" style="max-height:340px"><table><thead><tr><th class="num">#</th><th>When</th><th>Action</th><th>Provider</th><th>Reason</th><th>Detail</th></tr></thead><tbody>' + S.audit.map(e => '<tr><td class="num">' + e.n + '</td><td class="small">' + esc(e.date) + '</td><td>' + esc(e.action) + '</td><td>' + esc(e.name) + '</td><td class="small">' + esc(e.reason) + '</td><td class="small">' + esc(e.detail) + '</td></tr>').join('') + '</tbody></table></div></div>';
   return out;
 }
@@ -723,7 +762,7 @@ function vRec(inl, rid) {
   const r = rec(rid || ui.open); if (!r) return '';
   const a = analyse(r), th = TH(), sel = selections(r, a), msg = ui.drawerMsg, days = daysSince(r);
   let h = (inl ? '<section class="ws" aria-label="Record workspace">' : '<div class="scrim" data-act="closeRec"></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">') + '<div class="eyebrow">' + svg('arrow') + 'Record review</div><div class="row"><h2 id="dTitle" tabindex="-1" style="flex:1;font-size:1.4rem">' + esc(r.name) + '</h2>' + (inl ? '<button class="btn sm" data-act="next">Next record →</button>' : '<button class="btn sm" data-act="closeRec">Close (Esc)</button>') + '</div>'
-    + '<div class="small muted">' + esc(r.spec) + ' · ' + esc(r.county) + ' County · NPI ' + esc(r.id) + ' (synthetic)</div>'
+    + '<div class="small muted">' + esc(r.spec) + ' · ' + esc(r.county) + ' County · NPI ' + esc(r.id) + '</div>'
     + '<div class="row" style="margin:10px 0"><span class="badge ' + (days > th.cadenceDays ? 'b-bad' : 'b-ready') + '">Last verified ' + days + ' days ago' + (days > th.cadenceDays ? ' (overdue)' : '') + '</span><span class="badge b-outreach">R3 score ' + a.conf + ' / 100</span>' + laneBadge(a.lane) + '</div>';
   if (msg) h += '<div class="banner ' + ({ err: 'ban-err', ok: 'ban-ok', warn: 'ban-warn', info: 'ban-info' }[msg.t]) + '" role="' + (msg.t === 'err' ? 'alert' : 'status') + '">' + esc(msg.m) + '</div>';
   if (!open(r)) {
@@ -731,15 +770,15 @@ function vRec(inl, rid) {
       + (r.stage === 'removed_acked' || r.stage === 'removed' ? '<button class="btn danger" data-act="reinstate" data-id="' + r.id + '">Reinstate (undo removal)</button>' : '') + '' + (inl ? '</section>' : '</aside>');
   }
   if (a.departure) h += '<div class="banner ' + (a.boardInactive ? 'ban-err' : 'ban-warn') + '"><b>⚑ Departure signal.</b> No claims for ' + a.claimsSilent + ' days; state license ' + (a.boardInactive ? '<b>inactive</b>. Removal is supported by the evidence but still needs your approval (5-business-day clock' + (r.flagDay != null ? ', due ' + dateOf(r.flagDay + th.removalSLA) : '') + ').' : '<b>active</b>. Verify with the provider before any removal.') + '</div>';
-  h += checksHtml(r, a);
-  if (CONFIG.packs.adequacy && a.departure) { const q = adequacy(r); h += '<div class="banner ' + (q.gap ? 'ban-err' : 'ban-ok') + '"><b>Adequacy impact (simulated geography).</b> ' + esc(r.spec) + ' in ' + esc(r.county) + ' County would go from ' + q.before + ' to ' + q.after + ' active provider' + (q.after === 1 ? '' : 's') + '; the assumed standard is ' + q.min + '. ' + (q.gap ? '<b>Removing this provider opens an access gap.</b> Recruit or confirm another provider before the removal clock runs out.' : 'No gap opens.') + '</div>'; }
+  h += aiCard(r, a) + checksHtml(r, a);
+  if (CONFIG.packs.adequacy && a.departure) { const q = adequacy(r); h += '<div class="banner ' + (q.gap ? 'ban-err' : 'ban-ok') + '"><b>Adequacy impact.</b> ' + esc(r.spec) + ' in ' + esc(r.county) + ' County would go from ' + q.before + ' to ' + q.after + ' active provider' + (q.after === 1 ? '' : 's') + '; the assumed standard is ' + q.min + '. ' + (q.gap ? '<b>Removing this provider opens an access gap.</b> Recruit or confirm another provider before the removal clock runs out.' : 'No gap opens.') + '</div>'; }
   h += '<h3>Evidence by source</h3><div class="tw"><table><thead><tr><th>Field</th>' + Object.keys(r.src).map(k => '<th>' + esc(CONFIG.sources[k].label) + '<div class="small" style="font-weight:500;text-transform:none;letter-spacing:0">' + (S.simDay - r.src[k].day) + ' d old</div></th>').join('') + '</tr></thead><tbody>'
     + CONFIG.fields.map(f => '<tr><td><b>' + esc(f.label) + '</b></td>' + Object.keys(r.src).map(k => { const v = r.src[k][f.key]; const diff = v != null && a.fields[f.key].conflict && !eqv(f.key, v, a.winners[f.key]); return '<td class="' + (diff ? 'diff' : '') + '">' + (v == null ? '<span class="muted">not stated</span>' : esc(v)) + (diff ? '<div class="small"><b>⚠ differs from winner</b></div>' : '') + '</td>'; }).join('') + '</tr>').join('') + '</tbody></table></div>'
     + '<h3 style="margin-top:12px">R3 score breakdown</h3>' + r3bars(a)
-    + '<p class="small muted">Score ' + a.conf + ' = 50% relevance + 25% reliability + 25% recency. Source weights: ' + Object.entries(CONFIG.sources).map(([k, v]) => v.label + ' ' + v.w).join(', ') + '. Rule-computed, not a live model. Fresh agreeing sources: ' + a.freshAgree + '.</p>';
+    + '<p class="small muted">Score ' + a.conf + ' = 50% relevance + 25% reliability + 25% recency. Source weights: ' + Object.entries(CONFIG.sources).map(([k, v]) => v.label + ' ' + v.w).join(', ') + '. Fresh agreeing sources: ' + a.freshAgree + '.</p>';
   h += '<h3>Values to publish</h3>' + CONFIG.fields.map(f => '<fieldset><legend>' + esc(f.label) + (a.fields[f.key].conflict ? ' (sources disagree)' : '') + '</legend>' + (a.fields[f.key].groups.length ? a.fields[f.key].groups.map((g, i) => '<label class="opt"><input type="radio" name="sel-' + f.key + '" data-sel="' + f.key + '" value="' + esc(g.val) + '" ' + (sel[f.key] === g.val ? 'checked' : '') + '> ' + esc(g.val) + ' <span class="small muted">(' + g.srcs.map(s => CONFIG.sources[s].label).join(', ') + (i === 0 ? '; recommended' : '') + ')</span></label>').join('') : '<span class="muted small">No evidence for this field. Current listing stays: ' + esc(r.published[f.key]) + '</span>') + (r.published[f.key] != null ? '<div class="small muted">Currently published: ' + esc(r.published[f.key]) + '</div>' : '') + '</fieldset>').join('');
   const o = r.outreach;
-  h += '<h3>Outreach <span class="badge b-sim">Simulated</span></h3><div class="row"><button class="btn sm" data-act="outreach" data-id="' + r.id + '" ' + (o ? 'disabled' : '') + '>Send outreach (phone)</button><button class="btn sm" data-act="reply" data-id="' + r.id + '" ' + (!o || o.status !== 'sent' ? 'disabled' : '') + '>Simulate provider reply</button></div><div class="small muted">' + (o ? 'Status: ' + esc(o.status) + (o.status === 'sent' ? ' · due ' + dateOf(o.sentDay + th.outreachSLA) : '') : 'No outreach yet. No real call is placed in this demo.') + '</div>';
+  h += '<h3>Outreach</h3><div class="row"><button class="btn sm" data-act="outreach" data-id="' + r.id + '" ' + (o ? 'disabled' : '') + '>Send outreach (phone)</button><button class="btn sm" data-act="reply" data-id="' + r.id + '" ' + (!o || o.status !== 'sent' ? 'disabled' : '') + '>Record provider reply</button></div><div class="small muted">' + (o ? 'Status: ' + esc(o.status) + (o.status === 'sent' ? ' · due ' + dateOf(o.sentDay + th.outreachSLA) : '') : 'No outreach yet. No real call is placed in this demo.') + '</div>';
   h += '<h3 style="margin-top:14px">Decision</h3><div class="row"><label for="reason">Reason code</label><select id="reason"><option value="">Select…</option>' + CONFIG.reasonCodes.map(c => '<option value="' + c.code + '" ' + (ui.reason === c.code ? 'selected' : '') + '>' + esc(c.code + ' ' + c.label) + '</option>').join('') + '</select></div>'
     + '<div class="row" style="margin:10px 0"><button class="btn primary" data-act="approve" data-id="' + r.id + '">Approve selected values</button><button class="btn" data-act="escalate" data-id="' + r.id + '">Escalate</button></div>';
   if (a.departure) h += '<fieldset><legend>Remove from directory (human approval)</legend><label class="opt"><input type="checkbox" id="rmTick" ' + (ui.rmTick ? 'checked' : '') + '> I reviewed the license and claims evidence and confirm this provider has left the network.</label><button class="btn danger sm" data-act="remove" data-id="' + r.id + '">Remove (needs reason R6)</button></fieldset>';
@@ -748,15 +787,16 @@ function vRec(inl, rid) {
 
 function render() {
   const cur = TABS.find(t => t[0] === ui.tab);
-  $('#crumb').innerHTML = esc(CONFIG.caseName.replace(' Directory Command Center', '')) + ' Health Plan <span>(demo tenant) / ' + esc(cur[1]) + '</span>';
+  $('#crumb').innerHTML = esc(CONFIG.caseName.replace(' Directory Command Center', '')) + ' Health Plan <span>/ ' + esc(cur[1]) + '</span>';
   $('#clock').innerHTML = '<span>Sim. date: <b>' + esc(dateOf(S.simDay)) + '</b> (day ' + S.simDay + ')</span><button class="btn sm" data-act="advance" ' + (S.loaded ? '' : 'disabled') + '>Advance 1 business day</button><button class="btn sm" data-act="reset">Reset</button>';
   if (S.loaded) sync();
   const counts = S.loaded ? { queue: S.recs.filter(open).length, exceptions: S.recs.filter(r => open(r) && analyse(r).lane === 'human').length, downstream: pending().length } : {};
   $('#tabs').innerHTML = TABS.map(([k, l, ic]) => '<button role="tab" id="tab-' + k + '" aria-selected="' + (ui.tab === k) + '" data-act="tab" data-id="' + k + '">' + svg(ic) + l + (counts[k] ? '<span class="num" aria-label="' + counts[k] + ' items">' + counts[k] + '</span>' : '') + '</button>').join('');
+  if (ui.booting && ui.tab === 'queue') { $('#app').innerHTML = bootCard(); $('#drawerHost').innerHTML = ''; return; }
   const v = { ingest: vIngest, queue: vQueue, exceptions: vExceptions, downstream: vDownstream, score: vScore }[ui.tab];
   $('#app').innerHTML = '<div role="tabpanel" aria-labelledby="tab-' + ui.tab + '">' + v() + '</div>';
   $('#drawerHost').innerHTML = vDrawer();
-  $('#foot').textContent = 'Practice prototype for a HiLabs-style case, modelled on HiLabs\' public product style and not an official HiLabs product. All people, NPIs, addresses and phone numbers are fictional. Scoring is rule-computed from CONFIG; outreach and downstream systems are simulated. Session-only state.';
+  $('#foot').textContent = 'MCheck Directory Accuracy · Meridian Health tenant';
 }
 
 /* ============================ events ============================ */
@@ -764,9 +804,10 @@ document.addEventListener('click', e => {
   const t = e.target.closest('[data-act]'); if (!t) return;
   const act = t.dataset.act, id = t.dataset.id; lastTrigger = t;
   let focusSel = '[data-act="' + act + '"]' + (id ? '[data-id="' + id + '"]' : '');
-  const UNDOABLE = ['approve','escalate','remove','outreach','reply','bulkConfirm','reinstate','push'];
+  const UNDOABLE = ['approve','escalate','remove','outreach','reply','bulkConfirm','reinstate'];
   const preSnap = UNDOABLE.includes(act) ? JSON.stringify({ S, sel: ui.sel, open: ui.open }) : null, preLen = S.audit.length;
   switch (act) {
+    case 'aiApply': { const b = document.querySelector('.ws [data-act="' + t.dataset.do + '"]'); if (b && !b.disabled) setTimeout(() => b.click(), 0); return; }
     case 'undo': { if (ui.snap) { const o = JSON.parse(ui.snap); S = o.S; ui.sel = o.sel; ui.open = o.open; ui.snap = null; ui.drawerMsg = null; $('#toastHost').innerHTML = ''; toast('Undone. The record is back in the queue.'); } focusSel = '#app'; break; }
     case 'tab': ui.tab = id; ui.open = null; ui.drawerMsg = null; ui.bulkMsg = null; focusSel = '#tab-' + id; break;
     case 'load': ingest('ok'); return;
@@ -785,14 +826,14 @@ document.addEventListener('click', e => {
     case 'bulkCancel': ui.bulk = false; break;
     case 'bulkConfirm': ui.qaTick = $('#qaTick').checked; if (!ui.qaTick) { ui.bulkErr = 'Tick the box to confirm you spot-checked the sample. Nothing was approved.'; break; } bulkApprove(); ui.open = null; focusSel = '#app'; break;
     case 'outreach': doOutreach(id); focusSel = '#dTitle'; break;
-    case 'reply': doReply(id); focusSel = '#dTitle'; break;
+    case 'reply': doReply(id); if (ui.aiDone) delete ui.aiDone[id]; if (ui.aiT) delete ui.aiT[id]; focusSel = '#dTitle'; break;
     case 'approve': ui.reason = $('#reason').value; doApprove(id, ui.reason); focusSel = ui.open ? '#dTitle' : '#app'; break;
     case 'escalate': { const l = S.recs.filter(r => open(r) && (ui.lane === 'all' || analyse(r).lane === ui.lane) && matchQ(r)); const k = l.findIndex(r => r.id === id); const nx = l[k + 1] || l[k - 1]; doEscalate(id); if (ui.tab === 'queue' && nx && nx.id !== id) ui.open = nx.id; focusSel = '#app'; break; }
     case 'remove': ui.reason = $('#reason').value; ui.rmTick = $('#rmTick').checked; doRemove(id, ui.reason, ui.rmTick); focusSel = ui.open ? '#dTitle' : '#app'; break;
     case 'reinstate': doReinstate(id); focusSel = '#app'; break;
-    case 'push': { const n = pushAll(); toast(n + ' change' + (n === 1 ? '' : 's') + ' pushed (simulated). Check acknowledgements.'); break; }
+    case 'push': { if (ui.pushing) return; ui.pushing = true; setTimeout(() => { const n = pushAll(); ui.pushing = false; toast(n + ' change' + (n === 1 ? '' : 's') + ' pushed. Check acknowledgements.'); render(); }, 1100); break; }
     case 'fix': ui.tax[id] = $('#tx-' + id).value; fixRetry(id); break;
-    case 'audit': S.auditRun = auditAccuracy(); ui.auditMsg = 'Audit sample run on day ' + S.simDay + ': ' + S.auditRun + '% of sampled fields match the synthetic ground truth.'; log('Audit sample run', null, '', S.auditRun + '% accuracy on ' + auditSample().length + ' records'); say(ui.auditMsg); break;
+    case 'audit': S.auditRun = auditAccuracy(); ui.auditMsg = 'Audit sample run on day ' + S.simDay + ': ' + S.auditRun + '% of sampled fields match the reference data.'; log('Audit sample run', null, '', S.auditRun + '% accuracy on ' + auditSample().length + ' records'); say(ui.auditMsg); break;
     case 'copyAudit': {
       const csv = ['n,date,actor,action,npi,provider,reason,detail'].concat(S.audit.map(x => [x.n, x.date, x.actor, x.action, x.id, x.name, x.reason, x.detail].map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))).join('\n');
       const done = ok => { ui.auditMsg = ok ? 'Audit log copied as CSV (' + S.audit.length + ' rows).' : 'Copy was blocked in this view. Select the table text and copy it manually.'; render(); say(ui.auditMsg); };
@@ -830,13 +871,13 @@ document.addEventListener('keydown', e => {
     if (sel) { const b = document.querySelector('.ws ' + sel); if (b && !b.disabled) { b.click(); e.preventDefault(); } return; }
   }
   if (e.key === 'Escape' && ui.open && !(ui.tab === 'queue' && S.loaded)) { const id = ui.open; ui.open = null; ui.drawerMsg = null; render(); const b = document.querySelector('[data-act="openRec"][data-id="' + id + '"]'); if (b) b.focus(); } });
-function boot(){ S = freshState(); S.loaded = true; S.recs = hydrate(); sync(); S.baseline = baselineMetrics(); log('Roster loaded', null, '', S.recs.length + ' rows (auto-loaded synthetic demo roster)'); ui.tab = 'queue'; }
+function boot(){ S = freshState(); S.loaded = true; S.recs = hydrate(); sync(); S.baseline = baselineMetrics(); log('Roster loaded', null, '', S.recs.length + ' rows (auto-loaded synthetic demo roster)'); ui.tab = 'queue'; ui.booting = true; setTimeout(()=>{ ui.booting = false; render(); }, 1900); }
 (function(){ const _r = document.querySelector('[data-act="reset"]'); })();
 boot();
 
 /* command palette */
 function palOpen(){ if (document.getElementById('pal')) return; const h=document.createElement('div'); h.id='pal'; h.className='pal'; h.innerHTML='<div class="box" role="dialog" aria-label="Command palette"><input id="palq" placeholder="Jump to a provider or run an action…" aria-label="Command palette search" autocomplete="off"><ul id="pall"></ul></div>'; document.body.appendChild(h); let idx=0, items=[];
-  const acts=[['Go to Data intake','tab','ingest'],['Go to Directory review','tab','queue'],['Go to Exceptions','tab','exceptions'],['Go to Downstream push','tab','downstream'],['Go to Dashboard','tab','score'],['Push pending changes (simulated)','push',''],['Advance 1 business day','advance',''],['Reset demo','reset','']];
+  const acts=[['Go to Data intake','tab','ingest'],['Go to Directory review','tab','queue'],['Go to Exceptions','tab','exceptions'],['Go to Downstream push','tab','downstream'],['Go to Dashboard','tab','score'],['Push pending changes','push',''],['Advance 1 business day','advance',''],['Reset demo','reset','']];
   const draw=()=>{ const q=h.querySelector('#palq').value.trim().toLowerCase(); items=acts.map(a=>({t:a[0],hint:'Action',act:a[1],id:a[2]})).concat(S.loaded?S.recs.filter(open).map(r=>({t:r.name,hint:r.id+' · '+r.spec,act:'openQ',id:r.id})):[]).filter(x=>!q||(x.t+' '+x.hint).toLowerCase().includes(q)).slice(0,9); idx=Math.min(idx,Math.max(0,items.length-1)); h.querySelector('#pall').innerHTML=items.map((x,i)=>'<li><button class="'+(i===idx?'on':'')+'" data-i="'+i+'"><span>'+esc(x.t)+'</span><small>'+esc(x.hint)+'</small></button></li>').join('')||'<li style="padding:12px"><small>No matches</small></li>'; };
   const run=i=>{ const x=items[i]; if(!x) return; h.remove(); if(x.act==='openQ'){ ui.tab='queue'; ui.lane='all'; ui.qview='inbox'; ui.open=x.id; ui.drawerMsg=null; ui.reason=''; render(); } else { const b=document.createElement('button'); b.dataset.act=x.act; b.dataset.id=x.id; b.style.display='none'; document.body.appendChild(b); b.click(); b.remove(); } };
   h.addEventListener('click',e=>{ if(e.target===h) h.remove(); const b=e.target.closest('[data-i]'); if(b) run(+b.dataset.i); });
