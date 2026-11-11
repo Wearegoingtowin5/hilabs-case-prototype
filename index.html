@@ -194,6 +194,15 @@ aside.drawer{border-left:0;border-radius:24px 0 0 24px;padding:24px}
 .bcol{background:#eef3fd;border-radius:16px;padding:10px;min-height:200px}.bh{font-weight:800;color:var(--navy);font-size:.82rem;padding:2px 4px 8px;display:flex;justify-content:space-between}
 .bcard{display:block;width:100%;text-align:left;background:#fff;border:1px solid #dfe8fb;border-radius:14px;padding:10px;margin-bottom:8px;cursor:pointer;box-shadow:0 4px 10px rgba(7,38,105,.05)}.bcard:hover{border-color:var(--blue)}
 #costsim,#rules{margin:8px 0}
+
+.toast{display:flex;align-items:center;gap:12px}.toast .tundo{background:#fff;color:var(--navy);border:0;border-radius:999px;padding:4px 12px;font-weight:700;cursor:pointer}.toast .tundo:focus-visible{outline:3px solid #ffcf5c}
+.status{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 12px}.status h2{font-size:1.15rem;margin:0}.status .prog{flex:1 1 220px;min-width:180px}.status .pbar{height:8px;border-radius:99px;background:#dfe6f5;overflow:hidden}.status .pbar i{display:block;height:100%;background:linear-gradient(90deg,#2a6af1,#5d3fd3);border-radius:99px;transition:width .35s}.status .plabel{font-size:.8rem;color:var(--muted,#5b6785);margin-top:3px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chips span{font-size:.8rem;padding:3px 10px;border-radius:99px;background:#eef2fb;color:#1a2a55}.chips b{margin-left:4px}
+details.tools{margin:0 0 10px;border:1px dashed #c8d3ee;border-radius:12px;padding:6px 12px}details.tools>summary{cursor:pointer;font-weight:600;color:#33436f}
+.pal{position:fixed;inset:0;background:rgba(7,20,60,.45);z-index:60;display:flex;justify-content:center;align-items:flex-start;padding-top:12vh}
+.pal .box{background:#fff;width:min(560px,92vw);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden}.pal input{width:100%;border:0;border-bottom:1px solid #e2e8f6;padding:16px 18px;font-size:1.05rem;outline:none;box-sizing:border-box}
+.pal ul{list-style:none;margin:0;padding:6px;max-height:50vh;overflow:auto}.pal li button{width:100%;text-align:left;background:none;border:0;padding:9px 12px;border-radius:9px;font:inherit;cursor:pointer;display:flex;justify-content:space-between;gap:10px}.pal li button.on,.pal li button:hover{background:#eaf0ff}.pal small{color:#6a7799}
+.kbd{font:600 .72rem/1 ui-monospace,monospace;border:1px solid #c8d3ee;border-radius:6px;padding:2px 6px;color:#51608a}
 </style>
 </head>
 <body>
@@ -339,6 +348,7 @@ function log(action, r, reason, detail) {
 }
 function say(msg) { $('#live').textContent = ''; setTimeout(() => $('#live').textContent = msg, 30); }
 function toast(msg) { const h = $('#toastHost'); h.innerHTML = '<div class="toast" role="status">' + esc(msg) + '</div>'; say(msg); clearTimeout(toast.t); toast.t = setTimeout(() => h.innerHTML = '', 3800); }
+function addUndo(){ const tm=$('#toastHost .toast'); if(!tm||!ui.snap) return; tm.insertAdjacentHTML('beforeend','<button class="tundo" data-act="undo">Undo</button>'); clearTimeout(toast.t); toast.t=setTimeout(()=>{$('#toastHost').innerHTML='';},7000); }
 
 /* ============================ domain logic ============================ */
 function hydrate() {
@@ -544,6 +554,10 @@ function heroBand(slim){
    +'<div><h3>Where all '+S.recs.length+' directory entries stand today</h3><div class="stack" role="img" aria-label="'+seg.map(x=>x[0]+' '+x[1]).join(', ')+'">'+seg.map(x=>'<i style="width:'+(100*x[1]/tot)+'%;background:'+x[2]+'"></i>').join('')+'</div><div class="lg">'+seg.map(x=>'<span><em style="background:'+x[2]+'"></em>'+x[0]+' <b>'+x[1]+'</b></span>').join('')+'</div></div>'
    +'<div class="hstats"><div class="hstat"><b>'+m.exOpen+(od?' · '+od+' overdue':'')+'</b><span>Open exceptions</span></div><div class="hstat"><b>'+pending().length+'</b><span>Pending push to Directory and Facets</span></div></div></section>';
 }
+function statusLine(rows){
+  const tot=S.recs.length||1,done=S.recs.filter(r=>!open(r)).length,n=l=>rows.filter(x=>x.a.lane===l).length;
+  return '<div class="status"><h2>Review queue</h2><div class="prog"><div class="pbar" role="progressbar" aria-valuemin="0" aria-valuemax="'+tot+'" aria-valuenow="'+done+'" aria-label="Records resolved"><i style="width:'+(100*done/tot)+'%"></i></div><div class="plabel">'+done+' of '+tot+' resolved · '+rows.length+' to go</div></div><div class="chips"><span>Auto <b>'+n('auto')+'</b></span><span>Outreach <b>'+n('outreach')+'</b></span><span>Human <b>'+n('human')+'</b></span><span class="kbd" title="Command palette">Ctrl K</span></div></div>';
+}
 function tileMap(){
   const by={};S.recs.forEach(r=>{(by[r.county]=by[r.county]||{t:0,d:0});by[r.county].t++;if(!open(r))by[r.county].d++;});
   return '<div class="card" style="margin-bottom:14px"><h3>Verification progress by county</h3><p class="muted small" style="margin:2px 0 0">Share of entries resolved (approved, pushed or removed). A stand-in for the MCheck network map.</p><div class="tiles">'+Object.keys(by).map(k=>{const p=Math.round(100*by[k].d/by[k].t);const bg=p>=75?'linear-gradient(135deg,#4f8a10,#7ab51d)':p>=35?'linear-gradient(135deg,#2a6af1,#5d3fd3)':'linear-gradient(135deg,#c9871a,#e8b92f)';return '<div class="tile" style="background:'+bg+'"><span>'+esc(k)+' County</span><b>'+p+'%</b><span>'+by[k].d+' of '+by[k].t+' resolved</span></div>';}).join('')+'</div></div>';
@@ -577,19 +591,21 @@ function vQueue() {
   const rows = S.recs.filter(open).map(r => ({ r, a: analyse(r) })).sort((x, y) => ord[x.a.lane] - ord[y.a.lane] || x.a.conf - y.a.conf);
   const cnt = l => rows.filter(x => x.a.lane === l).length;
   const shown = rows.filter(x => (ui.lane === 'all' || x.a.lane === ui.lane) && matchQ(x.r));
-  let out = phead('queue') + heroBand(true) + '<div class="card"><div class="row"><h3 style="flex:1">Entries due for verification</h3><button class="btn primary" data-act="bulkOpen" ' + (cnt('auto') ? '' : 'disabled') + '>Approve ' + cnt('auto') + ' auto-verified…</button></div>';
+  let out = statusLine(rows) + '<div class="card"><div class="row"><h3 style="flex:1">Entries due for verification</h3><button class="btn primary" data-act="bulkOpen" ' + (cnt('auto') ? '' : 'disabled') + '>Approve ' + cnt('auto') + ' auto-verified…</button></div>';
   if (ui.bulkMsg) out += '<div class="banner ban-ok" role="status">' + esc(ui.bulkMsg.m) + '</div>';
   if (ui.bulk) {
     const sample = rows.filter(x => x.a.lane === 'auto').slice(0, 2);
     out += '<div class="banner ban-info" role="group" aria-label="QA spot check"><b>QA spot check before bulk approval.</b> Review this sample of ' + sample.length + ' of ' + cnt('auto') + ' auto-verified records:<ul>' + sample.map(x => '<li>' + esc(x.r.name) + ': ' + esc(x.a.winners.address) + ', ' + esc(x.a.winners.phone) + ' (R3 score ' + x.a.conf + ')</li>').join('') + '</ul>'
       + '<label class="opt"><input type="checkbox" id="qaTick" ' + (ui.qaTick ? 'checked' : '') + '> I spot-checked the sample and the values look right.</label><div class="row"><button class="btn primary" data-act="bulkConfirm">Approve ' + cnt('auto') + ' records</button><button class="btn" data-act="bulkCancel">Cancel</button></div>' + (ui.bulkErr ? '<div role="alert" class="small" style="color:var(--red)">' + esc(ui.bulkErr) + '</div>' : '') + '</div>';
   }
+  out += '<details class="tools" ' + (ui.rulesOpen || ui.costOpen ? 'open' : '') + '><summary>Tools: rules and cost what-if</summary>';
   out += '<details ' + (ui.rulesOpen ? 'open' : '') + ' id="rules"><summary><b>Configurable rules for this plan</b> (change a value and the lanes update)</summary><div class="row" style="margin:8px 0">'
     + '<label>Auto-verify at R3 score ≥ <input type="number" id="thAuto" min="50" max="100" value="' + th.auto + '"></label>'
     + '<label>Human review below <input type="number" id="thLow" min="0" max="95" value="' + th.low + '"></label>'
     + '<label>Cadence (days) <input type="number" id="thCad" min="30" max="365" value="' + th.cadenceDays + '"></label></div>'
     + '<p class="small muted">R3 score = 50% relevance (reliability-weighted agreement of sources, needing 2+) + 25% reliability (best agreeing source) + 25% recency (freshest agreeing source). Auto-verify also needs no source conflict and 2+ fresh agreeing sources. Departure flags and escalations always go to a human.</p></details>';
   out += costSimHtml();
+  out += '</details>';
   if (CONFIG.packs.rollup) {
     const miss = CONFIG.fields.map(f => [f.label, rows.filter(x => !x.a.fields[f.key].cands.length).length]).filter(x => x[1] >= 2), thin = rows.filter(x => Object.keys(x.r.src).length < 3).length;
     if (miss.length || thin >= 2) out += '<div class="banner ban-info" role="note"><b>Systemic gaps, shown once instead of per row:</b> ' + miss.map(m => m[1] + ' entries have no ' + m[0].toLowerCase() + ' in any source').concat(thin >= 2 ? [thin + ' entries rely on fewer than 3 sources'] : []).join('; ') + '.</div>';
@@ -748,13 +764,16 @@ document.addEventListener('click', e => {
   const t = e.target.closest('[data-act]'); if (!t) return;
   const act = t.dataset.act, id = t.dataset.id; lastTrigger = t;
   let focusSel = '[data-act="' + act + '"]' + (id ? '[data-id="' + id + '"]' : '');
+  const UNDOABLE = ['approve','escalate','remove','outreach','reply','bulkConfirm','reinstate','push'];
+  const preSnap = UNDOABLE.includes(act) ? JSON.stringify({ S, sel: ui.sel, open: ui.open }) : null, preLen = S.audit.length;
   switch (act) {
+    case 'undo': { if (ui.snap) { const o = JSON.parse(ui.snap); S = o.S; ui.sel = o.sel; ui.open = o.open; ui.snap = null; ui.drawerMsg = null; $('#toastHost').innerHTML = ''; toast('Undone. The record is back in the queue.'); } focusSel = '#app'; break; }
     case 'tab': ui.tab = id; ui.open = null; ui.drawerMsg = null; ui.bulkMsg = null; focusSel = '#tab-' + id; break;
     case 'load': ingest('ok'); return;
     case 'loadBad': ingest('bad'); return;
     case 'loadEmpty': ingest('empty'); return;
     case 'advance': S.simDay++; log('Simulated clock advanced', null, '', 'Day ' + S.simDay + ' (' + dateOf(S.simDay) + ')'); toast('Advanced to ' + dateOf(S.simDay) + '. Evidence is one day older; timers moved.'); break;
-    case 'reset': Object.assign(CONFIG.thresholds, TH0); Object.assign(CONFIG.costs, { wrongPublish: 150, review: 12 }); ui.costOpen = false; ui.ask = null; S = freshState(); ui = { tab: 'ingest', open: null, lane: 'all', loading: false, ingest: null, drawerMsg: null, bulk: false, bulkMsg: null, sel: {}, tax: {}, taxMsg: {}, auditMsg: '', filterQ: '' }; $('#q').value = ''; toast('Reset to the initial state.'); focusSel = '#tab-ingest'; break;
+    case 'reset': Object.assign(CONFIG.thresholds, TH0); Object.assign(CONFIG.costs, { wrongPublish: 150, review: 12 }); ui.costOpen = false; ui.ask = null; S = freshState(); ui = { tab: 'ingest', open: null, lane: 'all', loading: false, ingest: null, drawerMsg: null, bulk: false, bulkMsg: null, sel: {}, tax: {}, taxMsg: {}, auditMsg: '', filterQ: '' }; $('#q').value = ''; boot(); toast('Reset to the initial state.'); focusSel = '#tab-queue'; break;
     case 'next': { const l = S.recs.filter(r => open(r) && (ui.lane === 'all' || analyse(r).lane === ui.lane) && matchQ(r)); const k = l.findIndex(r => r.id === ui.open); const n = l[k + 1] || l[0]; if (n) { ui.open = n.id; ui.drawerMsg = null; ui.reason = ''; ui.rmTick = false; } focusSel = '#dTitle'; break; }
     case 'qview': ui.qview = id; break;
     case 'boardOpen': ui.qview = 'inbox'; ui.lane = 'all'; ui.open = id; ui.drawerMsg = null; ui.reason = ''; ui.rmTick = false; focusSel = '#dTitle'; break;
@@ -768,7 +787,7 @@ document.addEventListener('click', e => {
     case 'outreach': doOutreach(id); focusSel = '#dTitle'; break;
     case 'reply': doReply(id); focusSel = '#dTitle'; break;
     case 'approve': ui.reason = $('#reason').value; doApprove(id, ui.reason); focusSel = ui.open ? '#dTitle' : '#app'; break;
-    case 'escalate': doEscalate(id); focusSel = '#app'; break;
+    case 'escalate': { const l = S.recs.filter(r => open(r) && (ui.lane === 'all' || analyse(r).lane === ui.lane) && matchQ(r)); const k = l.findIndex(r => r.id === id); const nx = l[k + 1] || l[k - 1]; doEscalate(id); if (ui.tab === 'queue' && nx && nx.id !== id) ui.open = nx.id; focusSel = '#app'; break; }
     case 'remove': ui.reason = $('#reason').value; ui.rmTick = $('#rmTick').checked; doRemove(id, ui.reason, ui.rmTick); focusSel = ui.open ? '#dTitle' : '#app'; break;
     case 'reinstate': doReinstate(id); focusSel = '#app'; break;
     case 'push': { const n = pushAll(); toast(n + ' change' + (n === 1 ? '' : 's') + ' pushed (simulated). Check acknowledgements.'); break; }
@@ -783,6 +802,7 @@ document.addEventListener('click', e => {
   }
   if (ui.tab === 'queue' && S.loaded && ['approve', 'remove'].includes(act) && ui.open && rec(ui.open) && !open(rec(ui.open)) && !(ui.drawerMsg && ui.drawerMsg.t === 'err')) { const l = S.recs.filter(r => open(r) && (ui.lane === 'all' || analyse(r).lane === ui.lane) && matchQ(r)); const n = l[0]; if (n) { const m = ui.drawerMsg; ui.open = n.id; ui.reason = ''; ui.rmTick = false; ui.drawerMsg = m; } }
   render();
+  if (preSnap && S.audit.length !== preLen) { ui.snap = preSnap; addUndo(); }
   if (focusSel) { const el = document.querySelector(focusSel); if (el) el.focus(); }
 });
 document.addEventListener('change', e => {
@@ -810,6 +830,19 @@ document.addEventListener('keydown', e => {
     if (sel) { const b = document.querySelector('.ws ' + sel); if (b && !b.disabled) { b.click(); e.preventDefault(); } return; }
   }
   if (e.key === 'Escape' && ui.open && !(ui.tab === 'queue' && S.loaded)) { const id = ui.open; ui.open = null; ui.drawerMsg = null; render(); const b = document.querySelector('[data-act="openRec"][data-id="' + id + '"]'); if (b) b.focus(); } });
+function boot(){ S = freshState(); S.loaded = true; S.recs = hydrate(); sync(); S.baseline = baselineMetrics(); log('Roster loaded', null, '', S.recs.length + ' rows (auto-loaded synthetic demo roster)'); ui.tab = 'queue'; }
+(function(){ const _r = document.querySelector('[data-act="reset"]'); })();
+boot();
+
+/* command palette */
+function palOpen(){ if (document.getElementById('pal')) return; const h=document.createElement('div'); h.id='pal'; h.className='pal'; h.innerHTML='<div class="box" role="dialog" aria-label="Command palette"><input id="palq" placeholder="Jump to a provider or run an action…" aria-label="Command palette search" autocomplete="off"><ul id="pall"></ul></div>'; document.body.appendChild(h); let idx=0, items=[];
+  const acts=[['Go to Data intake','tab','ingest'],['Go to Directory review','tab','queue'],['Go to Exceptions','tab','exceptions'],['Go to Downstream push','tab','downstream'],['Go to Dashboard','tab','score'],['Push pending changes (simulated)','push',''],['Advance 1 business day','advance',''],['Reset demo','reset','']];
+  const draw=()=>{ const q=h.querySelector('#palq').value.trim().toLowerCase(); items=acts.map(a=>({t:a[0],hint:'Action',act:a[1],id:a[2]})).concat(S.loaded?S.recs.filter(open).map(r=>({t:r.name,hint:r.id+' · '+r.spec,act:'openQ',id:r.id})):[]).filter(x=>!q||(x.t+' '+x.hint).toLowerCase().includes(q)).slice(0,9); idx=Math.min(idx,Math.max(0,items.length-1)); h.querySelector('#pall').innerHTML=items.map((x,i)=>'<li><button class="'+(i===idx?'on':'')+'" data-i="'+i+'"><span>'+esc(x.t)+'</span><small>'+esc(x.hint)+'</small></button></li>').join('')||'<li style="padding:12px"><small>No matches</small></li>'; };
+  const run=i=>{ const x=items[i]; if(!x) return; h.remove(); if(x.act==='openQ'){ ui.tab='queue'; ui.lane='all'; ui.qview='inbox'; ui.open=x.id; ui.drawerMsg=null; ui.reason=''; render(); } else { const b=document.createElement('button'); b.dataset.act=x.act; b.dataset.id=x.id; b.style.display='none'; document.body.appendChild(b); b.click(); b.remove(); } };
+  h.addEventListener('click',e=>{ if(e.target===h) h.remove(); const b=e.target.closest('[data-i]'); if(b) run(+b.dataset.i); });
+  h.addEventListener('keydown',e=>{ if(e.key==='Escape'){h.remove();return;} if(e.key==='ArrowDown'){idx=Math.min(items.length-1,idx+1);draw();e.preventDefault();} if(e.key==='ArrowUp'){idx=Math.max(0,idx-1);draw();e.preventDefault();} if(e.key==='Enter'){run(idx);e.preventDefault();} });
+  h.querySelector('#palq').addEventListener('input',()=>{idx=0;draw();}); draw(); h.querySelector('#palq').focus(); }
+document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); palOpen(); } });
 render();
 </script>
 </body>
