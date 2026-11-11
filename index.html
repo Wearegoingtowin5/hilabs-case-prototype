@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCheck Directory Accuracy: Verification Command Center (Simulated Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#2a6af1;--blue-d:#1f55c8;--navy:#072669;--navy-d:#051a47;--ink:#29303d;--muted:#465167;--bg:#f4f7fd;--card:#fff;--bd:#cfdcf8;--bd2:#e3eaf8;--green:#4f8a10;--greenL:#e9f5d6;--yellow:#946a00;--yellowL:#fff3cc;--orange:#b85a00;--orangeL:#ffe9d2;--red:#c42d2d;--redL:#fde4e4;--purple:#6a3dd0;--blueL:#e6eefe;--grey:#6b7587}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font:14.5px/1.5 "Plus Jakarta Sans",Satoshi,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+h1,h2,h3{margin:0;color:var(--navy);font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.6rem}h3{font-size:1.02rem}
+button,input,select{font:inherit}
+:focus-visible{outline:3px solid #f5a623;outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.shell{display:flex;min-height:100vh}
+.side{width:224px;flex:none;background:linear-gradient(180deg,var(--navy) 0%,var(--navy-d) 100%);color:#fff;padding:18px 12px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.brand{font-weight:800;font-size:1.65rem;letter-spacing:-.02em;padding:2px 10px 0}
+.brand b{color:#5b8cff}.brand sup{font-size:.45em;font-weight:600;opacity:.8}
+.prod{padding:0 10px 14px;font-size:.78rem;color:#b9c7ee;border-bottom:1px solid rgba(255,255,255,.14);margin-bottom:8px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;align-items:center;gap:10px;background:transparent;border:0;color:#cfdaf7;padding:10px 12px;border-radius:10px;cursor:pointer;text-align:left;font-weight:600;font-size:.92rem}
+.nav button svg{width:18px;height:18px;flex:none}
+.nav button:hover{background:rgba(255,255,255,.08)}
+.nav button[aria-selected="true"]{background:var(--blue);color:#fff}
+.nav .num{margin-left:auto;background:#fff;color:var(--navy);border-radius:999px;font-size:.72rem;padding:0 7px;font-weight:800}
+.sidefoot{margin-top:auto;font-size:.72rem;color:#9fb1e2;padding:8px 10px}
+.mainwrap{flex:1;min-width:0}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:#fff;border-bottom:1px solid var(--bd2);padding:10px 24px;position:sticky;top:0;z-index:5}
+.crumb{font-weight:700;color:var(--navy);flex:1 1 220px}
+.crumb span{color:var(--muted);font-weight:500}
+.search{flex:0 1 280px;position:relative}
+.search input{width:100%;border:1.5px solid var(--bd);border-radius:999px;padding:8px 14px 8px 36px;background:var(--bg)}
+.search svg{position:absolute;left:12px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--grey)}
+.sim{background:linear-gradient(90deg,#29b2e6,#5d3fd3);color:#fff;font-weight:800;font-size:.72rem;padding:5px 11px;border-radius:999px;letter-spacing:.04em}
+.clock{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--muted)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--blueL);color:var(--blue);display:grid;place-items:center;font-weight:800;font-size:.8rem}
+main{padding:22px 24px 8px;max-width:1280px;outline:none}
+.eyebrow{display:flex;align-items:center;gap:6px;color:var(--blue);font-weight:800;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase}
+.eyebrow svg{width:14px;height:14px}
+.phead{margin-bottom:14px}
+.phead p{margin:4px 0 0;color:var(--muted);max-width:760px}
+.card{background:var(--card);border:1.5px solid var(--bd);border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(7,38,105,.05)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.muted{color:var(--muted)}.small{font-size:.84rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:1.5px solid var(--blue);background:#fff;color:var(--blue);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700}
+.btn:hover{background:var(--blueL)}
+.btn.primary{border-color:transparent;color:#fff;background:linear-gradient(90deg,#29b2e6,#5d3fd3)}
+.btn.primary:hover{filter:brightness(.93)}
+.btn.navy{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.danger{border-color:var(--red);color:var(--red)}
+.btn.danger:hover{background:var(--redL)}
+.btn.sm{padding:5px 12px;font-size:.86rem;white-space:nowrap}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.badge{display:inline-block;border:1.5px solid;border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.b-auto{background:var(--greenL);color:var(--green);border-color:#a8d26a}
+.b-outreach{background:var(--blueL);color:var(--blue-d);border-color:#9bb8f8}
+.b-human{background:var(--yellowL);color:var(--yellow);border-color:#f0c64d}
+.b-ready{background:var(--greenL);color:var(--green);border-color:#a8d26a}
+.b-done{background:#eef1f6;color:var(--grey);border-color:#c9d0dc}
+.b-bad{background:var(--redL);color:var(--red);border-color:#f0a1a1}
+.b-sim{background:#efe9fd;color:var(--purple);border-color:#c8b8f3}
+.tw{border:1.5px solid var(--bd);border-radius:14px;overflow:auto;background:#fff}
+table{border-collapse:collapse;width:100%}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;font-size:.9rem;border-bottom:1px solid var(--bd2)}
+th{background:#eef3fd;color:var(--navy);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#f8faff}
+td.num,th.num{text-align:right}
+.diff{background:var(--yellowL)}
+.kpi{background:#fff;border:1.5px solid var(--bd);border-radius:18px;padding:14px 16px;box-shadow:0 6px 18px rgba(7,38,105,.05)}
+.kpi .l{font-size:.82rem;color:var(--muted);font-weight:600}
+.kpi .v{font-size:2rem;font-weight:800;color:var(--blue);line-height:1.15}
+.kpi .d{display:inline-block;font-size:.76rem;font-weight:700;border-radius:999px;padding:0 8px;margin-top:2px}
+.d-up{background:var(--greenL);color:var(--green)}.d-flat{background:#eef1f6;color:var(--grey)}.d-bad{background:var(--redL);color:var(--red)}
+.bar2{height:10px;background:#e3eaf8;border-radius:5px;margin:4px 0}
+.bar2 i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#29b2e6,#2a6af1)}
+.bar2 i.base{background:#aab6cf}
+.banner{border:1.5px solid;border-radius:12px;padding:9px 12px;margin:10px 0;font-size:.9rem}
+.ban-err{background:var(--redL);border-color:#f0a1a1}.ban-ok{background:var(--greenL);border-color:#a8d26a}.ban-warn{background:var(--yellowL);border-color:#f0c64d}.ban-info{background:var(--blueL);border-color:#9bb8f8}
+.alertchip{display:inline-flex;align-items:center;gap:6px;background:var(--redL);color:var(--red);border-radius:8px;padding:2px 9px;font-weight:700;font-size:.78rem}
+.steps{margin:6px 0 0;padding-left:20px}
+.spinner{display:inline-block;width:14px;height:14px;border:3px solid var(--bd);border-top-color:var(--blue);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spinner{animation:none}}
+.pillstat{display:inline-flex;align-items:center;align-self:center;gap:10px;background:#fff;border:2px solid var(--blue);border-radius:999px;padding:6px 20px 6px 8px;box-shadow:0 6px 16px rgba(42,106,241,.14)}
+.pillstat .ic{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center}
+.pillstat .ic svg{width:18px;height:18px}
+.pillstat .t{font-size:.74rem;color:var(--ink);font-weight:600;line-height:1.1}
+.pillstat .v{font-weight:800;color:var(--green);font-size:1.15rem;line-height:1.1}
+.donutwrap{display:flex;flex-wrap:wrap;align-items:center;gap:18px;border:2px solid var(--blue);border-radius:28px;padding:14px 20px;background:#fff;box-shadow:0 8px 22px rgba(42,106,241,.12)}
+.legend{display:grid;gap:5px;font-size:.84rem}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:9px;height:9px;border-radius:50%;flex:none}
+.legend b{margin-left:auto;background:#eef1f8;border-radius:5px;padding:0 6px;font-size:.74rem}
+.legend span{min-width:150px}
+aside.drawer{position:fixed;top:0;right:0;bottom:0;width:min(660px,100%);background:#fff;border-left:2px solid var(--navy);box-shadow:-10px 0 28px rgba(7,38,105,.25);overflow-y:auto;z-index:20;padding:18px}
+.scrim{position:fixed;inset:0;background:rgba(7,38,105,.4);z-index:10}
+fieldset{border:1.5px solid var(--bd);border-radius:12px;margin:8px 0;padding:6px 12px}
+legend{font-weight:700;font-size:.86rem;padding:0 4px;color:var(--navy)}
+label.opt{display:block;padding:2px 0;font-size:.9rem}
+select,input[type=number],input[type=text]{border:1.5px solid var(--bd);border-radius:10px;padding:6px 10px;background:#fff}
+input[type=number]{width:90px}
+.r3{display:grid;gap:6px;margin:8px 0}
+.r3 div{display:grid;grid-template-columns:90px 1fr 44px;gap:8px;align-items:center;font-size:.84rem}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:999px;z-index:40;max-width:92%;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+footer{padding:6px 24px 28px;color:var(--grey);font-size:.78rem;max-width:1280px}
+@media (max-width:860px){
+  .shell{flex-direction:column}
+  .side{width:100%;height:auto;position:static;flex-direction:row;align-items:center;flex-wrap:wrap;padding:10px 12px}
+  .prod,.sidefoot{display:none}
+  .nav{flex-direction:row;overflow-x:auto;width:100%}
+  .nav button{white-space:nowrap;padding:8px 12px}
+  main{padding:14px 12px}.bar{padding:8px 12px}
+  h2{font-size:1.3rem}.kpi .v{font-size:1.6rem}
+}
+
+/* ===== v3 visual refresh ===== */
+body{background:radial-gradient(1200px 500px at 85% -10%,#e4ecff 0,transparent 60%),#f5f8fe;font-size:14.5px}
+.side{width:248px;background:linear-gradient(180deg,#0a2f7e 0%,#072669 55%,#051a47 100%);padding:22px 14px;gap:4px}
+.brand{font-size:1.9rem;padding:0 10px}
+.prod{margin:2px 0 14px;padding:0 10px 16px}
+.nav button{white-space:nowrap;padding:11px 12px;border-radius:12px;font-size:.92rem;transition:background .15s}
+.nav button[aria-selected="true"]{background:linear-gradient(90deg,#2a6af1,#4a7df5);box-shadow:0 6px 16px rgba(42,106,241,.45)}
+.nav .num{background:#ff6b6b;color:#fff;min-width:22px;text-align:center}
+.nav button[aria-selected="true"] .num{background:#fff;color:var(--blue)}
+.bar{flex-wrap:nowrap;padding:12px 28px;gap:14px;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border-bottom:1px solid #e3eaf8}
+.crumb{flex:1 1 120px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95rem}
+.search{flex:0 0 170px}.search input{min-width:0}
+.sim{white-space:nowrap}
+.clock{white-space:nowrap;gap:8px}.clock span{font-size:.82rem}
+.clock .btn{white-space:nowrap}
+main{padding:26px 28px 10px;max-width:1320px}
+.phead h2{font-size:1.85rem;letter-spacing:-.02em}
+.phead p{font-size:.95rem}
+.card{border:1px solid #dfe8fb;border-radius:20px;padding:20px;box-shadow:0 10px 30px rgba(7,38,105,.06)}
+.kpi{border:1px solid #dfe8fb;border-radius:20px;padding:16px 18px;display:grid;grid-template-columns:44px 1fr;gap:2px 12px;align-items:center;box-shadow:0 10px 30px rgba(7,38,105,.06)}
+.kpi .ico{grid-row:1/4;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#e7efff,#f1ecff);color:var(--blue);display:grid;place-items:center}
+.kpi .ico svg{width:22px;height:22px}
+.kpi .v{font-size:1.9rem;color:var(--navy)}
+.tw{border:1px solid #dfe8fb;border-radius:18px}
+th{background:#f3f7ff;font-size:.72rem;color:#5b6a8c;padding:11px 14px;border-bottom:1px solid #e3eaf8}
+td{padding:12px 14px}
+tbody tr{transition:background .12s}
+.prov{display:flex;align-items:center;gap:11px}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.8rem;color:#fff;flex:none}
+.ring{--p:0;--c:#4f8a10;width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#e3eaf8 0);display:grid;place-items:center;position:relative;margin-left:auto}
+.ring::before{content:"";position:absolute;inset:5px;background:#fff;border-radius:50%}
+.ring b{position:relative;font-size:.8rem;color:var(--navy)}
+.hero{background:linear-gradient(120deg,#072669 0%,#1a4fc4 55%,#5d3fd3 120%);color:#fff;border-radius:24px;padding:22px 26px;display:grid;grid-template-columns:auto 1fr auto;gap:26px;align-items:center;margin-bottom:16px;box-shadow:0 18px 40px rgba(7,38,105,.28);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero h3{color:#fff;font-size:1.1rem}.hero .sub{color:#c8d7fb;font-size:.84rem}
+.bigring{--p:0;width:112px;height:112px;border-radius:50%;background:conic-gradient(#7be0a5 calc(var(--p)*1%),rgba(255,255,255,.18) 0);display:grid;place-items:center;position:relative}
+.bigring::before{content:"";position:absolute;inset:10px;background:#0c3290;border-radius:50%}
+.bigring b{position:relative;font-size:1.7rem;font-weight:800}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.18);margin:10px 0 8px}
+.stack i{display:block;height:100%}
+.lg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.82rem;color:#dbe6ff}
+.lg span{display:inline-flex;align-items:center;gap:6px}.lg em{width:9px;height:9px;border-radius:50%;display:inline-block}
+.hstats{display:grid;gap:8px}
+.hstat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:8px 14px;min-width:150px}
+.hstat b{display:block;font-size:1.35rem;line-height:1.1}.hstat span{font-size:.74rem;color:#c8d7fb}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:10px}
+.tile{border-radius:16px;padding:14px;color:#fff;min-height:88px;display:flex;flex-direction:column;justify-content:space-between}
+.tile b{font-size:1.5rem}.tile span{font-size:.78rem;opacity:.95}
+.btn{transition:transform .1s,box-shadow .15s}
+.btn.primary{box-shadow:0 6px 16px rgba(93,63,211,.3)}.btn.primary:hover{transform:translateY(-1px)}
+.btn.sm.on{box-shadow:0 4px 12px rgba(7,38,105,.25)}
+aside.drawer{border-left:0;border-radius:24px 0 0 24px;padding:24px}
+@media (max-width:1100px){.search{display:none}.hero{grid-template-columns:auto 1fr}.hstats{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
+@media (max-width:860px){.side{padding:10px 12px}.nav button{padding:8px 12px}.bar{flex-wrap:wrap;padding:8px 12px}.hero{grid-template-columns:1fr;padding:18px}main{padding:16px 12px}.crumb{flex:1 1 100%;white-space:normal}.clock{flex-wrap:wrap;white-space:normal}.clock .btn{white-space:normal}}
+
+.hero.slim{padding:12px 20px;gap:18px;margin-bottom:12px;border-radius:18px}.hero.slim .bigring{width:64px;height:64px}.hero.slim .bigring::before{inset:7px}.hero.slim .bigring b{font-size:1.05rem}.hero.slim .sub{display:none}.hero.slim .stack{margin:6px 0}.hero.slim .hstats{grid-template-columns:repeat(2,auto)}.hero.slim .hstat{padding:6px 12px;min-width:0}.hero.slim .hstat b{font-size:1.05rem}
+.split{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start;margin-top:10px}
+.inbox{border:1px solid #dfe8fb;border-radius:18px;background:#fff;max-height:calc(100vh - 150px);overflow:auto;position:sticky;top:76px}
+.inhead{padding:10px 14px;font-size:.74rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#5b6a8c;background:#f3f7ff;border-bottom:1px solid #e3eaf8;position:sticky;top:0;z-index:1}
+.irow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:0;border-bottom:1px solid #eef2fb;padding:11px 12px;cursor:pointer;border-left:4px solid transparent}
+.irow:hover{background:#f6f9ff}.irow.sel{background:#eaf1ff;border-left-color:var(--blue)}
+.irow .it{display:grid;gap:2px;min-width:0;flex:1}.irow .it b{color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.irow .ring{width:38px;height:38px;flex:none}.irow .ring::before{inset:4px}.irow .ring b{font-size:.72rem}.irow .av{width:34px;height:34px}
+.ws{background:#fff;border:1px solid #dfe8fb;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(7,38,105,.06);min-width:0}
+.ws h3{margin-top:14px}
+@media (max-width:980px){.split{grid-template-columns:1fr}.inbox{position:static;max-height:260px}}
+
+.chk{list-style:none;margin:6px 0;padding:0;display:grid;gap:8px}.chk li{border:1px solid #e3eaf8;border-radius:12px;padding:8px 12px;background:#fbfcff}
+.board{display:grid;grid-template-columns:repeat(5,minmax(190px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.bcol{background:#eef3fd;border-radius:16px;padding:10px;min-height:200px}.bh{font-weight:800;color:var(--navy);font-size:.82rem;padding:2px 4px 8px;display:flex;justify-content:space-between}
+.bcard{display:block;width:100%;text-align:left;background:#fff;border:1px solid #dfe8fb;border-radius:14px;padding:10px;margin-bottom:8px;cursor:pointer;box-shadow:0 4px 10px rgba(7,38,105,.05)}.bcard:hover{border-color:var(--blue)}
+#costsim,#rules{margin:8px 0}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Hi<b>Labs</b><sup>™</sup></div>
+    <div class="prod">MCheck® Directory Accuracy<br>Verification Command Center</div>
+    <nav class="nav" role="tablist" aria-label="Screens" id="tabs"></nav>
+    <div class="sidefoot">Concept prototype modelled on HiLabs' public product style. Not an official HiLabs product.</div>
+  </aside>
+  <div class="mainwrap">
+    <header class="bar">
+      <div class="crumb" id="crumb"></div>
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><label class="sr" for="q">Search providers by name, NPI or specialty</label><input id="q" type="search" placeholder="Search provider, NPI, specialty" autocomplete="off"></div>
+      <span class="sim">SIMULATED DEMO DATA</span>
+      <div class="clock" id="clock"></div>
+      <div class="avatar" title="A. Rao (demo analyst)">AR</div>
+    </header>
+    <main id="app" tabindex="-1"></main>
+    <footer id="foot"></footer>
+  </div>
+</div>
+<div id="drawerHost"></div>
+<div id="live" class="sr" aria-live="polite" role="status"></div>
+<div id="toastHost"></div>
+<script>
+
+/* =====================================================================
+   CONFIG: everything that changes between problem statements lives here.
+   Swap names, fields, sources, thresholds, reason codes, downstream systems,
+   KPIs and records; the logic below reads only from CONFIG.
+   ===================================================================== */
+const CONFIG = {
+  caseName: 'Meridian Directory Command Center',
+  operator: 'A. Rao (demo analyst)',
+  owners: ['A. Rao', 'S. Mehta', 'Unassigned'],
+  packs: { validation: true, normalise: true, costSim: true, adequacy: true, ask: true, board: true, rollup: true },  // feature packs: switch off what a case does not need
+  minPerSpecCounty: 4,               // adequacy standard (assumption): providers per specialty per county
+  costs: { wrongPublish: 150, review: 12, errorK: 0.4 },  // illustrative cost model, editable in the UI
+  baseDate: '2026-11-11',            // simulated day 0 (a Wednesday)
+  noun: { one: 'provider', many: 'providers' },
+  thresholds: { auto: 90, low: 60, cadenceDays: 90, claimsSilentDays: 120, removalSLA: 5, outreachSLA: 2, exceptionSLA: 2 },
+  targets: { fresh: 95, removalSLA: 98, accuracy: 95, exceptionAge: 2 },
+  fields: [
+    { key: 'address', label: 'Address' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'accepting', label: 'Accepting new patients' }
+  ],
+  sources: {                           // w = reliability weight (design assumption)
+    roster:   { label: 'Plan roster',   w: 0.5 },
+    nppes:    { label: 'NPPES',         w: 0.6 },
+    board:    { label: 'State board',   w: 0.9 },
+    website:  { label: 'Website',       w: 0.7 },
+    outreach: { label: 'Outreach reply', w: 1.0 }
+  },
+  reasonCodes: [
+    { code: 'R1', label: 'Address changed' }, { code: 'R2', label: 'Phone changed' },
+    { code: 'R3', label: 'Accepting status changed' }, { code: 'R4', label: 'Confirmed by provider' },
+    { code: 'R5', label: 'Analyst override of lane' }, { code: 'R6', label: 'Provider left network' }
+  ],
+  downstream: [{ key: 'dir', label: 'Directory website' }, { key: 'facets', label: 'Facets (core admin)' }],
+  taxonomyBad: 'FM-0000',
+  records: buildRecords()
+};
+
+/* Deterministic synthetic records (no randomness, no real people). */
+function mkNpi(b9) { const d = ('80840' + b9).split('').reverse().map(Number); let sum = 0; d.forEach((x, i) => { if (i % 2 === 0) { x *= 2; if (x > 9) x -= 9; } sum += x; }); return b9 + ((10 - sum % 10) % 10); }
+function npiValid(n) { if (!/^\d{10}$/.test(n)) return false; const d = ('80840' + n).split('').reverse().map(Number); let sum = 0; d.forEach((x, i) => { if (i % 2 === 1) { x *= 2; if (x > 9) x -= 9; } sum += x; }); return sum % 10 === 0; }
+const normV = (k, v) => { if (v == null) return v; if (k === 'phone') return String(v).replace(/\D/g, ''); if (k === 'address') return String(v).toLowerCase().replace(/[.,]/g, '').replace(/\bstreet\b/g, 'st').replace(/\bavenue\b/g, 'ave').replace(/\broad\b/g, 'rd').replace(/\bdrive\b/g, 'dr').replace(/\blane\b/g, 'ln').replace(/\s+/g, ' ').trim(); return v; };
+const eqv = (k, a, b) => a === b || (CONFIG.packs.normalise && a != null && b != null && normV(k, a) === normV(k, b));
+function buildRecords() {
+  const names = ['Lena Ortiz','Rohan Khan','Mei Lee','Andre Diaz','Tara Wong','Priya Nair','Carlos Mendez','Hannah Brooks','Omar Haddad','Sofia Rossi','Daniel Kim','Grace Oyelaran','Victor Petrov','Alisha Verma','Ben Carter','Nadia Ibrahim','Luis Herrera','Emma Novak','Kofi Mensah','Julia Santos','Ravi Menon','Chloe Dubois','Marcus Hill','Ines Alvarez'];
+  const specs = ['Pediatrics','Behavioral Health','OB-GYN','Primary Care','Cardiology','Dermatology'];
+  const counties = ['Hillsborough','Pinellas','Pasco'];
+  const streetsOld = ['Palm Ave','Oak St','Cedar Ln','Maple Dr','Pine Ct','Elm Way'];
+  const streetsNew = ['Bay Rd','Harbor Blvd','Lake Dr','Gulf Pkwy','River Rd','Coral St'];
+  const types = ['hero','departed','addr','addr','addr','phone','phone','phone','sparse','sparse','sparse','clean','clean','clean','clean','clean','clean','clean','clean','clean','clean','clean','clean','clean'];
+  const lv = [104,210,121,133,112,99,140,126,260,175,188,40,150,38,110,125,45,160,135,72,118,95,170,142]; // days since last verified
+  const facetsBad = [14, 20];
+  return names.map((name, i) => {
+    const npi = mkNpi('100000' + String(i + 1).padStart(3, '0'));
+    const oldA = (12 + i * 7) + ' ' + streetsOld[i % 6] + ', Tampa FL';
+    const newA = (98 + i * 5) + ' ' + streetsNew[i % 6] + ', Tampa FL';
+    const ph0 = '813-555-01' + String(i).padStart(2, '0'), ph1 = '813-555-02' + String(i).padStart(2, '0');
+    const t = types[i];
+    const rec = { id: npi, name: 'Dr. ' + name, spec: specs[i % 6], county: counties[i % 3], lvDays: lv[i], claimsSilent: 20 + (i * 9) % 70,
+      board: { status: 'active' }, taxonomyBad: facetsBad.includes(i), src: {}, truth: {}, outreachReply: null };
+    const S = (age, o) => Object.assign({ age }, o);
+    if (t === 'clean') {
+      const v = { address: oldA, phone: ph0, accepting: 'Yes' };
+      if (i === 11) v.address = v.address.replace(' Dr,', ' Drive,').replace(' Ct,', ' Court,').replace(' Ln,', ' Lane,').replace(' Ave,', ' Avenue,').replace(' St,', ' Street,').replace(' Way,', ' Way,');
+      rec.src = { roster: S(lv[i], v), nppes: S(30 + (i % 4) * 10, { address: oldA, phone: ph0 }), board: S(12 + i % 10, { address: oldA }), website: S(3 + i % 8, v) };
+      rec.truth = Object.assign({}, v);
+      rec.outreachReply = Object.assign({}, v);
+    } else if (t === 'addr') {
+      rec.src = { roster: S(lv[i], { address: oldA, phone: ph0, accepting: 'Yes' }), nppes: S(45, { address: newA, phone: ph0 }), board: S(18, { address: newA }), website: S(6, { address: newA, phone: ph0, accepting: 'Yes' }) };
+      rec.truth = { address: newA, phone: ph0, accepting: 'Yes' };
+      rec.outreachReply = Object.assign({}, rec.truth);
+    } else if (t === 'phone') {
+      rec.src = { roster: S(lv[i], { address: oldA, phone: ph0, accepting: 'Yes' }), nppes: S(50, { address: oldA, phone: ph0 }), board: S(20, { address: oldA, phone: ph1 }), website: S(5, { address: oldA, phone: ph1, accepting: 'Yes' }) };
+      rec.truth = { address: oldA, phone: ph1, accepting: 'Yes' };
+      rec.outreachReply = Object.assign({}, rec.truth);
+    } else if (t === 'sparse') {
+      rec.src = { roster: S(lv[i], { address: oldA, phone: ph0, accepting: 'Yes' }), nppes: S(140, { address: oldA }) };
+      rec.truth = { address: newA, phone: ph0, accepting: 'Yes' };
+      rec.outreachReply = Object.assign({}, rec.truth);
+      rec.claimsSilent = 70 + i;
+    } else if (t === 'hero') {   // conflicting evidence plus a claims-silence flag; license active
+      rec.src = { roster: S(104, { address: '12 Palm Ave, Tampa FL', phone: '813-555-0101', accepting: 'Yes' }), nppes: S(41, { address: '98 Bay Rd, Tampa FL', phone: '813-555-0101' }), board: S(18, { address: '98 Bay Rd, Tampa FL' }), website: S(6, { address: '98 Bay Rd, Tampa FL', phone: '813-555-0177' }) };
+      rec.truth = { address: '98 Bay Rd, Tampa FL', phone: '813-555-0177', accepting: 'Yes' };
+      rec.outreachReply = Object.assign({}, rec.truth);
+      rec.claimsSilent = 140;
+    } else if (t === 'departed') { // genuinely left: license inactive, claims silent
+      rec.src = { roster: S(lv[i], { address: oldA, phone: ph0, accepting: 'Yes' }), nppes: S(200, { address: oldA, phone: ph0 }), board: S(10, {}) };
+      rec.board = { status: 'inactive' };
+      rec.truth = { left: true };
+      rec.outreachReply = null;
+      rec.claimsSilent = 210;
+    }
+    return rec;
+  });
+}
+
+/* ============================ helpers ============================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const FIELD = Object.fromEntries(CONFIG.fields.map(f => [f.key, f]));
+const TH = () => CONFIG.thresholds;
+const TH0 = JSON.parse(JSON.stringify(CONFIG.thresholds));
+function dateOf(bd) { const d = new Date(CONFIG.baseDate + 'T12:00:00'); let n = bd; while (n > 0) { d.setDate(d.getDate() + 1); if (d.getDay() !== 0 && d.getDay() !== 6) n--; } return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
+const median = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = Math.floor(s.length / 2); return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+const pct = (n, d) => d ? Math.round(100 * n / d) : null;
+const fmtPct = v => v == null ? '–' : v + '%';
+
+/* ============================ state ============================ */
+function freshState() { return { loaded: false, simDay: 0, recs: [], audit: [], baseline: null, auditRun: null, seq: 0 }; }
+let S = freshState();
+let ui = { tab: 'ingest', open: null, lane: 'all', loading: false, ingest: null, drawerMsg: null, bulk: false, bulkMsg: null, sel: {}, tax: {}, taxMsg: {}, auditMsg: '', filterQ: '' };
+let lastTrigger = null;
+
+function log(action, r, reason, detail) {
+  S.audit.unshift({ n: ++S.seq, day: S.simDay, date: dateOf(S.simDay), actor: CONFIG.operator, action, id: r ? r.id : '', name: r ? r.name : '', reason: reason || '', detail: detail || '' });
+}
+function say(msg) { $('#live').textContent = ''; setTimeout(() => $('#live').textContent = msg, 30); }
+function toast(msg) { const h = $('#toastHost'); h.innerHTML = '<div class="toast" role="status">' + esc(msg) + '</div>'; say(msg); clearTimeout(toast.t); toast.t = setTimeout(() => h.innerHTML = '', 3800); }
+
+/* ============================ domain logic ============================ */
+function hydrate() {
+  return CONFIG.records.map(c => {
+    const src = {};
+    Object.entries(c.src).forEach(([k, v]) => { const o = Object.assign({}, v); o.day = -v.age; delete o.age; src[k] = o; });
+    return { id: c.id, name: c.name, spec: c.spec, county: c.county, lvDay: -c.lvDays, claimsLastDay: -c.claimsSilent, board: Object.assign({}, c.board), src,
+      truth: Object.assign({}, c.truth), outreachReply: c.outreachReply, taxonomyBad: c.taxonomyBad, taxonomyFixed: false, taxonomyCode: c.taxonomyBad ? CONFIG.taxonomyBad : '207Q00000X',
+      published: Object.assign({}, c.src.roster ? { address: c.src.roster.address, phone: c.src.roster.phone, accepting: c.src.roster.accepting } : {}),
+      stage: 'todo', escalated: false, owner: 'Unassigned', outreach: null, confirmedActive: false, ackedVerified: c.lvDays <= TH().cadenceDays,
+      flagDay: null, exceptionDay: null, removedDay: null, autoApproved: false, push: null, ack: { dir: null, facets: null, err: '' } };
+  });
+}
+function analyse(r) {
+  const th = TH(), res = { fields: {}, conflict: false }; let fs = 0, rs = 0, rls = 0;
+  CONFIG.fields.forEach(f => {
+    const cands = [];
+    Object.entries(r.src).forEach(([k, v]) => { if (v[f.key] != null) { const age = S.simDay - v.day, rec = Math.max(0.15, 1 - age / 150); cands.push({ src: k, val: v[f.key], age, rec, eff: CONFIG.sources[k].w * rec }); } });
+    const groups = {};
+    cands.forEach(c => { const gk = CONFIG.packs.normalise ? normV(f.key, c.val) : c.val; const g = groups[gk] = groups[gk] || { val: c.val, eff: 0, rec: 0, srcs: [] }; g.eff += c.eff; g.rec = Math.max(g.rec, c.rec); g.srcs.push(c.src); });
+    const gl = Object.values(groups).sort((a, b) => b.eff - a.eff), total = cands.reduce((a, c) => a + c.eff, 0);
+    let score = 0, rec = 0, win = null, rel = 0;
+    if (gl.length) { win = gl[0].val; score = (gl[0].eff / total) * Math.min(1, cands.length / 2); rec = gl[0].rec; rel = Math.max(...gl[0].srcs.map(s => CONFIG.sources[s].w)); }
+    if (gl.length > 1) res.conflict = true;
+    res.fields[f.key] = { cands, groups: gl, win, conflict: gl.length > 1 };
+    fs += score; rs += rec; rls += rel;
+  });
+  const n = CONFIG.fields.length;
+  res.agree = fs / n; res.recency = rs / n; res.reliab = rls / n; res.conf = Math.round(100 * (0.5 * res.agree + 0.25 * res.recency + 0.25 * res.reliab));
+  res.winners = Object.fromEntries(CONFIG.fields.map(f => [f.key, res.fields[f.key].win]));
+  let fa = 0;
+  Object.values(r.src).forEach(v => { if (S.simDay - v.day <= th.cadenceDays && CONFIG.fields.every(f => v[f.key] == null || eqv(f.key, v[f.key], res.winners[f.key]))) fa++; });
+  res.freshAgree = fa;
+  res.claimsSilent = S.simDay - r.claimsLastDay;
+  res.boardInactive = r.board.status === 'inactive';
+  res.departure = (res.claimsSilent >= th.claimsSilentDays || res.boardInactive) && !r.confirmedActive;
+  const o = r.src.outreach;
+  res.confirmed = !!o && !res.departure && CONFIG.fields.every(f => o[f.key] == null || eqv(f.key, o[f.key], res.winners[f.key]));
+  res.lane = res.departure || r.escalated || res.conf < th.low ? 'human' : res.confirmed ? 'ready' : (res.conflict || res.conf < th.auto || fa < 2) ? 'outreach' : 'auto';
+  return res;
+}
+const SEV = { critical: ['Critical', 'b-bad'], high: ['High', 'b-human'], medium: ['Medium', 'b-outreach'], low: ['Low', 'b-done'], pass: ['Pass', 'b-ready'] };
+function checks(r, a) {
+  const th = TH(), out = [], add = (code, sev, msg) => out.push({ code, sev, msg });
+  add('NPI_FORMAT', npiValid(r.id) ? 'pass' : 'critical', npiValid(r.id) ? 'NPI format and check digit are valid (offline test; does not prove the NPI is active).' : 'NPI fails the check-digit test. The row cannot be submitted.');
+  if (a.departure) add('DEPARTURE_SIGNAL', a.boardInactive ? 'critical' : 'high', a.claimsSilent + ' days without claims' + (a.boardInactive ? ' and the state license is inactive.' : '; license still active, so verify before removal.'));
+  const conflicted = CONFIG.fields.filter(f => a.fields[f.key].conflict).map(f => f.label.toLowerCase());
+  add('SOURCE_CONFLICT', conflicted.length ? 'high' : 'pass', conflicted.length ? 'Sources disagree on ' + conflicted.join(', ') + '. Format-only differences (St vs Street, phone punctuation) are ignored.' : 'All sources agree after normalising formats.');
+  add('STALE_VERIFICATION', daysSince(r) > th.cadenceDays ? 'high' : 'pass', daysSince(r) > th.cadenceDays ? 'Last verified ' + daysSince(r) + ' days ago; cadence is ' + th.cadenceDays + '.' : 'Verified inside the ' + th.cadenceDays + '-day cadence.');
+  add('THIN_EVIDENCE', Object.keys(r.src).length < 3 || a.freshAgree < 2 ? 'medium' : 'pass', Object.keys(r.src).length < 3 || a.freshAgree < 2 ? 'Only ' + a.freshAgree + ' fresh agreeing source(s). Needs outreach or a human.' : a.freshAgree + ' fresh agreeing sources.');
+  if (r.taxonomyBad) add('TAXONOMY_RISK', 'medium', 'Specialty code may be rejected by the core system (simulated Facets rule).');
+  return out;
+}
+const SEVRANK = { critical: 0, high: 1, medium: 2, low: 3, pass: 4 };
+function checksHtml(r, a) {
+  if (!CONFIG.packs.validation) return '';
+  const cs = checks(r, a).sort((x, y) => SEVRANK[x.sev] - SEVRANK[y.sev]);
+  return '<h3>Checks run on this record</h3><ul class="chk">' + cs.map(c => '<li><span class="badge ' + SEV[c.sev][1] + '">' + SEV[c.sev][0] + '</span> <b>' + c.code + '</b><div class="small muted">' + esc(c.msg) + '</div></li>').join('') + '</ul>';
+}
+function adequacy(r) {
+  const gone = x => x.stage === 'removed' || x.stage === 'removed_acked';
+  const after = S.recs.filter(x => x.id !== r.id && x.spec === r.spec && x.county === r.county && !gone(x) && !analyse(x).departure).length;
+  return { after, before: after + 1, min: CONFIG.minPerSpecCounty, gap: after < CONFIG.minPerSpecCounty };
+}
+const LANE = { auto: ['Auto-verify', 'b-auto'], outreach: ['Outreach', 'b-outreach'], human: ['Human review', 'b-human'], ready: ['Ready: provider confirmed', 'b-ready'] };
+const STAGE_TXT = { todo: 'To do', outreach_sent: 'Outreach sent', approved: 'Approved, awaiting push', removed: 'Removed, awaiting push', acked: 'Verified and acknowledged', removed_acked: 'Removal acknowledged', rejected: 'Push rejected' };
+const open = r => r.stage === 'todo' || r.stage === 'outreach_sent';
+const daysSince = r => S.simDay - r.lvDay;
+function sync() { S.recs.forEach(r => { if (!open(r)) return; const a = analyse(r); if (a.lane === 'human' && r.exceptionDay == null) r.exceptionDay = S.simDay; if (a.departure && r.flagDay == null) r.flagDay = S.simDay; }); }
+function rec(id) { return S.recs.find(r => r.id === id); }
+function rc(code) { const c = CONFIG.reasonCodes.find(x => x.code === code); return c ? code + ' ' + c.label : code; }
+
+function ingest(kind) {
+  ui.loading = true; ui.ingest = null; render();
+  setTimeout(() => {
+    ui.loading = false;
+    if (kind === 'empty') { ui.ingest = { type: 'error', msg: 'The file has no data rows, so nothing was loaded.', fix: 'Choose a file with a header row and at least one record, or load the synthetic roster below. Your current session is unchanged.' }; render(); say('Load failed: empty file'); return; }
+    const had = S.loaded; S = freshState(); S.loaded = true; S.recs = hydrate(); sync();
+    S.baseline = baselineMetrics();
+    log('Roster loaded', null, '', S.recs.length + ' rows' + (kind === 'bad' ? ' (2 invalid rows rejected)' : ''));
+    ui.open = null; ui.bulk = false;
+    ui.ingest = kind === 'bad'
+      ? { type: 'partial', msg: '24 of 26 rows loaded; 2 rows were rejected.', rows: ['Row 7: missing NPI', 'Row 19: phone number is not a valid 10-digit number'], fix: 'The 24 valid rows are loaded and usable now. Correct the 2 rows in the source file and load again to add them.' }
+      : { type: 'ok', msg: 'All 24 rows loaded and standardised.' + (had ? ' (Session data was replaced.)' : '') };
+    render(); say(ui.ingest.msg);
+  }, 650);
+}
+function baselineMetrics() { const m = metrics(true); return { fresh: m.fresh, accuracy: auditAccuracy(), autoRate: 0, removal: null }; }
+function auditSample() { return S.recs.filter((r, i) => i % 2 === 0 && !r.truth.left); }
+function auditAccuracy() { const s = auditSample(); let ok = 0, tot = 0; s.forEach(r => CONFIG.fields.forEach(f => { tot++; if (r.published[f.key] === r.truth[f.key]) ok++; })); return pct(ok, tot); }
+function metrics(quiet) {
+  const act = S.recs.filter(r => r.stage !== 'removed' && r.stage !== 'removed_acked');
+  const fresh = act.filter(r => r.ackedVerified && daysSince(r) <= TH().cadenceDays).length;
+  const awaiting = act.filter(r => !r.ackedVerified && daysSince(r) <= TH().cadenceDays).length;
+  const removals = S.recs.filter(r => r.removedDay != null && r.flagDay != null);
+  const onTime = removals.filter(r => r.removedDay - r.flagDay <= TH().removalSLA).length;
+  const approvals = S.recs.filter(r => r.autoApproved || ['approved', 'acked', 'rejected'].includes(r.stage) || (r.approvedBy));
+  const auto = S.recs.filter(r => r.autoApproved).length;
+  const ex = S.recs.filter(r => open(r) && analyse(r).lane === 'human');
+  const pushed = S.recs.filter(r => ['acked', 'rejected', 'removed_acked'].includes(r.stage));
+  const acked = S.recs.filter(r => ['acked', 'removed_acked'].includes(r.stage));
+  return { fresh: pct(fresh, act.length), freshN: fresh, total: act.length, awaiting, removalSLA: pct(onTime, removals.length), removals: removals.length,
+    autoRate: pct(auto, approvals.length || 0), approvals: approvals.length, exOpen: ex.length, exMedian: median(ex.map(r => S.simDay - (r.exceptionDay == null ? S.simDay : r.exceptionDay))),
+    ackRate: pct(acked.length, pushed.length), pushed: pushed.length };
+}
+
+/* ---- actions on records ---- */
+function selections(r, a) {
+  const s = ui.sel[r.id] || {}; const out = {};
+  CONFIG.fields.forEach(f => out[f.key] = s[f.key] != null ? s[f.key] : a.winners[f.key]);
+  return out;
+}
+function doApprove(id, code) {
+  const r = rec(id), a = analyse(r), sel = selections(r, a);
+  const changed = CONFIG.fields.filter(f => sel[f.key] !== r.published[f.key]);
+  if (a.boardInactive && !r.confirmedActive) { ui.drawerMsg = { t: 'err', m: 'The state board shows this license as inactive. Do not approve the listing: remove it (with confirmation) or escalate. Your selections are kept.' }; return; }
+  const need = a.lane !== 'auto' && a.lane !== 'ready' || changed.length > 0;
+  if (need && !code) { ui.drawerMsg = { t: 'err', m: 'Choose a reason code before approving' + (changed.length ? ' (you changed ' + changed.map(f => f.label).join(', ') + ')' : ' (this record is not in the auto-verify lane)') + '. Your selections are kept.' }; return; }
+  const nochange = changed.length === 0 && r.ackedVerified && daysSince(r) <= TH().cadenceDays;
+  CONFIG.fields.forEach(f => { if (sel[f.key] != null) r.published[f.key] = sel[f.key]; });
+  r.lvDay = S.simDay; r.approvedBy = true; r.escalated = false;
+  if (nochange) { r.stage = 'acked'; r.push = null; } else { r.stage = 'approved'; r.push = 'update'; r.ackedVerified = false; }
+  log('Approved', r, code ? rc(code) : 'Auto-verify lane', changed.length ? 'Changed: ' + changed.map(f => f.label + ' → ' + sel[f.key]).join('; ') : 'No field changes');
+  ui.drawerMsg = null; ui.open = null; toast(r.name + ' approved. Push it on the Downstream screen.');
+}
+function doEscalate(id) { const r = rec(id); r.escalated = true; if (r.exceptionDay == null) r.exceptionDay = S.simDay; if (r.owner === 'Unassigned') r.owner = 'S. Mehta'; log('Escalated', r, '', 'Owner ' + r.owner); ui.drawerMsg = null; ui.open = null; toast(r.name + ' escalated to ' + r.owner); }
+function doOutreach(id) { const r = rec(id); r.outreach = { sentDay: S.simDay, status: 'sent' }; r.stage = 'outreach_sent'; log('Outreach sent (simulated phone call)', r, '', 'Due ' + dateOf(S.simDay + TH().outreachSLA)); ui.drawerMsg = { t: 'info', m: 'Simulated outreach queued. No real call was made. Use "Simulate provider reply" to continue the demo.' }; }
+function doReply(id) {
+  const r = rec(id);
+  if (!r.outreachReply) { r.outreach.status = 'no reply'; log('Outreach: no reply (simulated)', r, '', ''); ui.drawerMsg = { t: 'warn', m: 'Simulated result: no reply from this provider. Escalate, or remove if the license and claims evidence support it.' }; return; }
+  r.src.outreach = Object.assign({ day: S.simDay }, r.outreachReply); r.outreach.status = 'replied'; r.confirmedActive = true;
+  log('Outreach reply received (simulated)', r, '', 'Provider-confirmed values added as evidence'); ui.sel[r.id] = null; ui.drawerMsg = { t: 'ok', m: 'Simulated reply recorded as new evidence. Confidence and lane were recomputed.' };
+}
+function doRemove(id, code, confirmed) {
+  const r = rec(id), a = analyse(r);
+  if (!confirmed) { ui.drawerMsg = { t: 'err', m: 'Tick the confirmation box to show you reviewed the license and claims evidence. Nothing was removed.' }; return; }
+  if (code !== 'R6') { ui.drawerMsg = { t: 'err', m: 'Removal needs reason code R6 (Provider left network). Select it and try again.' }; return; }
+  r.removedDay = S.simDay; if (r.flagDay == null) r.flagDay = S.simDay; r.stage = 'removed'; r.push = 'remove';
+  log('Removal approved', r, rc('R6'), 'Claims silent ' + a.claimsSilent + ' days; board ' + r.board.status); ui.drawerMsg = null; ui.open = null; toast(r.name + ' marked for removal. Push it on the Downstream screen.');
+}
+function doReinstate(id) { const r = rec(id); r.stage = 'approved'; r.push = 'reinstate'; r.removedDay = null; r.ackedVerified = false; r.lvDay = S.simDay; log('Removal reversed (reinstated)', r, rc('R5'), 'Recovery from wrong removal; push required'); ui.open = null; toast(r.name + ' reinstated; push to restore the listing.'); }
+function bulkApprove() {
+  const autos = S.recs.filter(r => open(r) && analyse(r).lane === 'auto');
+  autos.forEach(r => { const nochange = r.ackedVerified && daysSince(r) <= TH().cadenceDays; r.lvDay = S.simDay; if (nochange) { r.stage = 'acked'; r.push = null; } else { r.stage = 'approved'; r.push = 'update'; r.ackedVerified = false; } r.autoApproved = true; log('Auto-verified and approved', r, 'Auto-verify lane', 'Confidence ' + analyse(r).conf + ' (QA spot check done)'); });
+  ui.bulk = false; ui.bulkMsg = { t: 'ok', m: autos.length + ' auto-verified records approved' + (autos.some(r => r.stage === 'approved') ? '. Push the changes on the Downstream push screen.' : '.') };
+}
+function pushAll() {
+  const items = S.recs.filter(r => r.push && (r.stage === 'approved' || r.stage === 'removed'));
+  items.forEach(r => {
+    r.ack.dir = 'ack';
+    if (r.taxonomyBad && !r.taxonomyFixed && r.push !== 'remove') { r.ack.facets = 'rejected'; r.ack.err = 'Facets rejected taxonomy code "' + r.taxonomyCode + '": not a valid code.'; r.stage = 'rejected'; log('Push rejected by Facets (simulated)', r, '', r.ack.err); }
+    else { r.ack.facets = 'ack'; r.stage = r.push === 'remove' ? 'removed_acked' : 'acked'; r.ackedVerified = r.push !== 'remove'; log('Push acknowledged by Directory website and Facets (simulated)', r, '', r.push); r.push = null; }
+  });
+  return items.length;
+}
+function fixRetry(id) {
+  const r = rec(id), code = (ui.tax[id] != null ? ui.tax[id] : r.taxonomyCode).trim();
+  if (!/^\d{3}[A-Z0-9]{7}$/.test(code)) { ui.taxMsg[id] = 'Code "' + code + '" is not valid. Use 10 characters, such as 207Q00000X. Your entry is kept; edit it and retry.'; return; }
+  r.taxonomyCode = code; r.taxonomyFixed = true; r.ack.facets = 'ack'; r.ack.err = ''; r.stage = 'acked'; r.ackedVerified = true; r.push = null; ui.taxMsg[id] = null;
+  log('Taxonomy corrected and retry acknowledged (simulated)', r, '', code); toast(r.name + ' acknowledged after fix.');
+}
+
+/* ============================ rendering ============================ */
+const ICON = {
+  upload: '<path d="M12 16V4m0 0l-4 4m4-4l4 4M4 20h16"/>', list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
+  alert: '<path d="M12 3l9 16H3L12 3zM12 10v4m0 3h.01"/>', send: '<path d="M4 12l16-8-6 16-3-7-7-1z"/>', chart: '<path d="M4 20V10m6 10V4m6 16v-8M2 20h20"/>',
+  gauge: '<path d="M4 16a8 8 0 1116 0M12 16l4-5"/>', arrow: '<path d="M5 12h12m-5-5l5 5-5 5"/>'
+};
+const svg = (n, extra) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ' + (extra || '') + '>' + ICON[n] + '</svg>';
+const TABS = [['ingest', 'Data intake', 'upload'], ['queue', 'Directory review', 'list'], ['exceptions', 'Exceptions', 'alert'], ['downstream', 'Downstream push', 'send'], ['score', 'Dashboard and audit', 'chart']];
+const PAGE = {
+  ingest: ['Data intake', 'Standardise the roster before it reaches downstream systems', 'Load a roster, see what was accepted and what was rejected, and keep the valid rows moving.'],
+  queue: ['Directory review', 'Verify every directory entry every ' + 90 + ' days', 'Entries are scored on reliability, relevance and recency (R3), then routed to auto-verify, outreach or a human.'],
+  exceptions: ['Exceptions', 'Human review for conflicts, departures and escalations', 'Removals always need a person, a reason and an audit entry.'],
+  downstream: ['Push to systems', 'A task is done only when the downstream system accepts it', 'Changes count toward directory accuracy only after every system acknowledges them.'],
+  score: ['Dashboard and audit', 'Directory accuracy: baseline vs now', 'One north star, supporting metrics with formulas, and an audit trail for every change.']
+};
+function phead(k) { const p = PAGE[k]; return '<div class="phead"><div class="eyebrow">' + svg('arrow') + p[0] + '</div><h2>' + (k === 'queue' ? 'Verify every directory entry every ' + TH().cadenceDays + ' days' : p[1]) + '</h2><p>' + p[2] + '</p></div>'; }
+function laneBadge(l) { return '<span class="badge ' + LANE[l][1] + '">' + LANE[l][0] + '</span>'; }
+function needData(k, msg) { return phead(k) + '<div class="card"><h3>' + esc(msg) + '</h3><p class="muted">No data is loaded yet. This is the empty state: every screen waits for the roster.</p><button class="btn primary" data-act="tab" data-id="ingest">Go to Data intake</button></div>'; }
+const dlt = (now, base, unit) => { if (now == null || base == null) return '<span class="d d-flat">no baseline</span>'; const d = now - base; return d > 0 ? '<span class="d d-up">↑ +' + d + ' ' + unit + ' vs baseline</span>' : d < 0 ? '<span class="d d-bad">↓ ' + d + ' ' + unit + ' vs baseline</span>' : '<span class="d d-flat">= baseline</span>'; };
+function pending() { return S.recs.filter(r => r.push && (r.stage === 'approved' || r.stage === 'removed')); }
+function overdueCount() { return S.recs.filter(r => open(r) && analyse(r).lane === 'human' && S.simDay - (r.exceptionDay == null ? S.simDay : r.exceptionDay) > TH().exceptionSLA).length; }
+function kpiStrip() {
+  const m = metrics(), b = S.baseline, od = overdueCount(), rj = S.recs.filter(r => r.stage === 'rejected').length, acc = S.auditRun != null ? S.auditRun : b.accuracy;
+  return '<div class="grid g4" style="margin-bottom:14px">'
+    + '<div class="kpi"><span class="ico">'+svg('gauge')+'</span><div class="l">Verified-fresh rate (north star)</div><div class="v">' + fmtPct(m.fresh) + '</div>' + dlt(m.fresh, b.fresh, 'pts') + '</div>'
+    + '<div class="kpi"><span class="ico">'+svg('arrow')+'</span><div class="l">Data accuracy (audit sample)</div><div class="v">' + fmtPct(acc) + '</div>' + (S.auditRun != null ? dlt(S.auditRun, b.accuracy, 'pts') : '<span class="d d-flat">baseline · run audit to update</span>') + '</div>'
+    + '<div class="kpi"><span class="ico">'+svg('gauge')+'</span><div class="l">Open exceptions</div><div class="v">' + m.exOpen + '</div>' + (od ? '<span class="alertchip">⚠ ' + od + ' overdue</span>' : '<span class="d d-up">all on time</span>') + '</div>'
+    + '<div class="kpi"><span class="ico">'+svg('send')+'</span><div class="l">Pending push</div><div class="v">' + pending().length + '</div>' + (rj ? '<span class="alertchip">✕ ' + rj + ' rejected</span>' : '<span class="d d-flat">none rejected</span>') + '</div></div>';
+}
+
+
+const AVC=['#2a6af1','#5d3fd3','#0e9db8','#e07a1f','#4f8a10','#c2417a'];
+function avatar(n){const w=n.replace('Dr. ','').split(' ');const i=(w[0][0]||'')+(w[1]?w[1][0]:'');let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%97;return '<span class="av" style="background:'+AVC[h%AVC.length]+'" aria-hidden="true">'+esc(i)+'</span>';}
+function ring(v){const c=v>=90?'#4f8a10':v>=60?'#2a6af1':'#d98a00';return '<span class="ring" style="--p:'+v+';--c:'+c+'" role="img" aria-label="R3 score '+v+' of 100"><b>'+v+'</b></span>';}
+function heroBand(slim){
+  const m=metrics(),rows=S.recs.filter(open).map(r=>analyse(r).lane),n=l=>rows.filter(x=>x===l).length;
+  const tot=S.recs.length||1,done=S.recs.filter(r=>!open(r)).length;
+  const seg=[['Auto-verifiable',n('auto'),'#7be0a5'],['Needs outreach',n('outreach'),'#6ea8ff'],['Needs a human',n('human'),'#ffcf5c'],['Resolved',done,'rgba(255,255,255,.55)']];
+  const fr=Math.round(m.fresh||0),od=overdueCount();
+  return '<section class="hero'+(slim?' slim':'')+'" aria-label="Verification summary"><div style="text-align:center"><div class="bigring" style="--p:'+fr+'" role="img" aria-label="Verified-fresh rate '+fr+' percent"><b>'+fr+'%</b></div><div class="sub" style="margin-top:6px">Verified-fresh</div></div>'
+   +'<div><h3>Where all '+S.recs.length+' directory entries stand today</h3><div class="stack" role="img" aria-label="'+seg.map(x=>x[0]+' '+x[1]).join(', ')+'">'+seg.map(x=>'<i style="width:'+(100*x[1]/tot)+'%;background:'+x[2]+'"></i>').join('')+'</div><div class="lg">'+seg.map(x=>'<span><em style="background:'+x[2]+'"></em>'+x[0]+' <b>'+x[1]+'</b></span>').join('')+'</div></div>'
+   +'<div class="hstats"><div class="hstat"><b>'+m.exOpen+(od?' · '+od+' overdue':'')+'</b><span>Open exceptions</span></div><div class="hstat"><b>'+pending().length+'</b><span>Pending push to Directory and Facets</span></div></div></section>';
+}
+function tileMap(){
+  const by={};S.recs.forEach(r=>{(by[r.county]=by[r.county]||{t:0,d:0});by[r.county].t++;if(!open(r))by[r.county].d++;});
+  return '<div class="card" style="margin-bottom:14px"><h3>Verification progress by county</h3><p class="muted small" style="margin:2px 0 0">Share of entries resolved (approved, pushed or removed). A stand-in for the MCheck network map.</p><div class="tiles">'+Object.keys(by).map(k=>{const p=Math.round(100*by[k].d/by[k].t);const bg=p>=75?'linear-gradient(135deg,#4f8a10,#7ab51d)':p>=35?'linear-gradient(135deg,#2a6af1,#5d3fd3)':'linear-gradient(135deg,#c9871a,#e8b92f)';return '<div class="tile" style="background:'+bg+'"><span>'+esc(k)+' County</span><b>'+p+'%</b><span>'+by[k].d+' of '+by[k].t+' resolved</span></div>';}).join('')+'</div></div>';
+}
+
+function vIngest() {
+  let out = phead('ingest') + '<div class="grid g2"><div class="card"><h3>Load the plan roster</h3><p class="muted small">Synthetic file: <b>roster_synthetic.csv</b> (24 providers, up to 5 evidence sources each). No real data is used.</p>'
+    + '<div class="row"><button class="btn primary" data-act="load" ' + (ui.loading ? 'disabled' : '') + '>Load synthetic roster (24 rows)</button>'
+    + '<button class="btn" data-act="loadBad" ' + (ui.loading ? 'disabled' : '') + '>Try file with 2 invalid rows</button>'
+    + '<button class="btn" data-act="loadEmpty" ' + (ui.loading ? 'disabled' : '') + '>Try empty file</button></div>';
+  if (ui.loading) out += '<p><span class="spinner"></span>Loading and standardising rows…</p>';
+  if (ui.ingest) {
+    const t = ui.ingest.type;
+    out += '<div class="banner ' + (t === 'ok' ? 'ban-ok' : t === 'partial' ? 'ban-warn' : 'ban-err') + '" role="alert"><b>' + esc(ui.ingest.msg) + '</b>'
+      + (ui.ingest.rows ? '<ul>' + ui.ingest.rows.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') + (ui.ingest.fix ? '<div>' + esc(ui.ingest.fix) + '</div>' : '') + '</div>';
+  }
+  out += '<p class="small muted">State is session-only: Reset (top right) or reloading the page returns to this screen.</p></div>';
+  out += '<div class="card"><h3>Suggested demo path (about 90 seconds)</h3><ol class="steps"><li>Load the roster, then open <b>Directory review</b>.</li><li>Approve the auto-verified batch after the QA spot check.</li><li>Open <b>Dr. Lena Ortiz</b>: conflicting sources and a claims-silence flag; send outreach, simulate the reply, approve.</li><li>Open the departed provider and remove with confirmation.</li><li><b>Downstream push</b>: push; fix the Facets reject and retry.</li><li><b>Dashboard</b>: baseline vs now; run the audit sample.</li></ol>'
+    + '<div class="banner ban-info small">Implemented: R3 scoring, lanes, approvals, audit log, SLA clock. Simulated: outreach calls, provider replies, Directory and Facets pushes. Not built: real integrations, authentication, persistence.</div></div></div>';
+  if (S.loaded) {
+    const c = { auto: 0, outreach: 0, human: 0 }; S.recs.forEach(r => { const l = analyse(r).lane; c[l] = (c[l] || 0) + 1; });
+    out += '<div class="card" style="margin-top:14px"><h3>Loaded: ' + S.recs.length + ' ' + CONFIG.noun.many + '. Starting lanes</h3><div class="row" style="margin:6px 0">' + laneBadge('auto') + ' <b>' + c.auto + '</b> ' + laneBadge('outreach') + ' <b>' + c.outreach + '</b> ' + laneBadge('human') + ' <b>' + c.human + '</b></div><p class="small muted">Baseline verified-fresh rate: <b>' + fmtPct(S.baseline.fresh) + '</b> (verified within ' + TH().cadenceDays + ' days and acknowledged downstream). Baseline audit-sample accuracy: <b>' + fmtPct(S.baseline.accuracy) + '</b>.</p><button class="btn navy" data-act="tab" data-id="queue">Open directory review</button></div>';
+  }
+  return out;
+}
+
+function matchQ(r) { const q = ui.filterQ.trim().toLowerCase(); return !q || (r.name + ' ' + r.id + ' ' + r.spec + ' ' + r.county).toLowerCase().includes(q); }
+function vQueue() {
+  if (!S.loaded) return needData('queue', 'Directory review');
+  const th = TH(), ord = { human: 0, outreach: 1, ready: 2, auto: 3 };
+  const rows = S.recs.filter(open).map(r => ({ r, a: analyse(r) })).sort((x, y) => ord[x.a.lane] - ord[y.a.lane] || x.a.conf - y.a.conf);
+  const cnt = l => rows.filter(x => x.a.lane === l).length;
+  const shown = rows.filter(x => (ui.lane === 'all' || x.a.lane === ui.lane) && matchQ(x.r));
+  let out = phead('queue') + heroBand(true) + '<div class="card"><div class="row"><h3 style="flex:1">Entries due for verification</h3><button class="btn primary" data-act="bulkOpen" ' + (cnt('auto') ? '' : 'disabled') + '>Approve ' + cnt('auto') + ' auto-verified…</button></div>';
+  if (ui.bulkMsg) out += '<div class="banner ban-ok" role="status">' + esc(ui.bulkMsg.m) + '</div>';
+  if (ui.bulk) {
+    const sample = rows.filter(x => x.a.lane === 'auto').slice(0, 2);
+    out += '<div class="banner ban-info" role="group" aria-label="QA spot check"><b>QA spot check before bulk approval.</b> Review this sample of ' + sample.length + ' of ' + cnt('auto') + ' auto-verified records:<ul>' + sample.map(x => '<li>' + esc(x.r.name) + ': ' + esc(x.a.winners.address) + ', ' + esc(x.a.winners.phone) + ' (R3 score ' + x.a.conf + ')</li>').join('') + '</ul>'
+      + '<label class="opt"><input type="checkbox" id="qaTick" ' + (ui.qaTick ? 'checked' : '') + '> I spot-checked the sample and the values look right.</label><div class="row"><button class="btn primary" data-act="bulkConfirm">Approve ' + cnt('auto') + ' records</button><button class="btn" data-act="bulkCancel">Cancel</button></div>' + (ui.bulkErr ? '<div role="alert" class="small" style="color:var(--red)">' + esc(ui.bulkErr) + '</div>' : '') + '</div>';
+  }
+  out += '<details ' + (ui.rulesOpen ? 'open' : '') + ' id="rules"><summary><b>Configurable rules for this plan</b> (change a value and the lanes update)</summary><div class="row" style="margin:8px 0">'
+    + '<label>Auto-verify at R3 score ≥ <input type="number" id="thAuto" min="50" max="100" value="' + th.auto + '"></label>'
+    + '<label>Human review below <input type="number" id="thLow" min="0" max="95" value="' + th.low + '"></label>'
+    + '<label>Cadence (days) <input type="number" id="thCad" min="30" max="365" value="' + th.cadenceDays + '"></label></div>'
+    + '<p class="small muted">R3 score = 50% relevance (reliability-weighted agreement of sources, needing 2+) + 25% reliability (best agreeing source) + 25% recency (freshest agreeing source). Auto-verify also needs no source conflict and 2+ fresh agreeing sources. Departure flags and escalations always go to a human.</p></details>';
+  out += costSimHtml();
+  if (CONFIG.packs.rollup) {
+    const miss = CONFIG.fields.map(f => [f.label, rows.filter(x => !x.a.fields[f.key].cands.length).length]).filter(x => x[1] >= 2), thin = rows.filter(x => Object.keys(x.r.src).length < 3).length;
+    if (miss.length || thin >= 2) out += '<div class="banner ban-info" role="note"><b>Systemic gaps, shown once instead of per row:</b> ' + miss.map(m => m[1] + ' entries have no ' + m[0].toLowerCase() + ' in any source').concat(thin >= 2 ? [thin + ' entries rely on fewer than 3 sources'] : []).join('; ') + '.</div>';
+  }
+  if (CONFIG.packs.board) out += '<div class="row" style="margin:10px 0" role="group" aria-label="View"><button class="btn sm ' + (ui.qview !== 'board' ? 'on' : '') + '" data-act="qview" data-id="inbox" aria-pressed="' + (ui.qview !== 'board') + '">Inbox view</button><button class="btn sm ' + (ui.qview === 'board' ? 'on' : '') + '" data-act="qview" data-id="board" aria-pressed="' + (ui.qview === 'board') + '">Pipeline board</button></div>';
+  out += '<div class="row" style="margin:12px 0" role="group" aria-label="Filter by lane"><button class="btn sm ' + (ui.lane === 'all' ? 'on' : '') + '" data-act="lane" data-id="all" aria-pressed="' + (ui.lane === 'all') + '">All (' + rows.length + ')</button>'
+    + ['auto', 'ready', 'outreach', 'human'].map(l => '<button class="btn sm ' + (ui.lane === l ? 'on' : '') + '" data-act="lane" data-id="' + l + '" aria-pressed="' + (ui.lane === l) + '">' + LANE[l][0] + ' (' + cnt(l) + ')</button>').join('') + (ui.filterQ ? ' <span class="small muted">Search: "' + esc(ui.filterQ) + '"</span>' : '') + '</div>';
+  if (ui.qview === 'board') out += boardHtml();
+  else if (!rows.length) out += '<div class="banner ban-ok">The queue is empty: every record has been approved, removed or is awaiting push. Check Downstream push.</div>';
+  else if (!shown.length) out += '<div class="banner ban-info">No records match this lane and search.</div>';
+  else {
+    if (!ui.open || !rec(ui.open) || (open(rec(ui.open)) && !shown.some(x => x.r.id === ui.open))) ui.open = shown[0].r.id;
+    out += '<div class="split"><div class="inbox" role="listbox" aria-label="Queue, press J or K to move"><div class="inhead">' + shown.length + ' to review · J / K to move</div>'
+      + shown.map(({ r, a }) => '<button class="irow ' + (ui.open === r.id ? 'sel' : '') + '" role="option" aria-selected="' + (ui.open === r.id) + '" data-act="openRec" data-id="' + r.id + '">' + avatar(r.name) + '<span class="it"><b>' + esc(r.name) + '</b><span class="small muted">' + esc(r.spec) + ' · ' + daysSince(r) + ' d' + (daysSince(r) > th.cadenceDays ? ' overdue' : '') + '</span><span>' + laneBadge(a.lane) + (a.conflict ? ' <span class="small">⚠ differs</span>' : '') + (a.departure ? ' <span class="small">⚑ departure</span>' : '') + '</span></span>' + ring(a.conf) + '</button>').join('')
+      + '</div>' + vRec(true, ui.open) + '</div>';
+  }
+  return out + '</div>';
+}
+
+function boardHtml() {
+  const cols = [['To review', r => r.stage === 'todo'], ['Outreach sent', r => r.stage === 'outreach_sent'], ['Approved, awaiting push', r => r.stage === 'approved' || r.stage === 'removed'], ['Acknowledged', r => r.stage === 'acked' || r.stage === 'removed_acked'], ['Push rejected', r => r.stage === 'rejected']];
+  return '<div class="board">' + cols.map(([t, f]) => { const rs = S.recs.filter(r => f(r) && matchQ(r)); return '<div class="bcol" role="group" aria-label="' + t + '"><div class="bh">' + t + ' <b>' + rs.length + '</b></div>' + (rs.length ? rs.map(r => { const a = analyse(r); return '<button class="bcard" data-act="boardOpen" data-id="' + r.id + '"><span class="prov">' + avatar(r.name) + '<span><b>' + esc(r.name) + '</b><span class="small muted" style="display:block">' + esc(r.spec) + ' · ' + esc(r.county) + '</span></span></span><span class="row" style="margin-top:6px">' + laneBadge(a.lane) + '<span class="small muted">R3 ' + a.conf + '</span>' + (r.exceptionDay != null && open(r) && S.simDay - r.exceptionDay > TH().exceptionSLA ? '<span class="alertchip">SLA</span>' : '') + '</span></button>'; }).join('') : '<div class="small muted" style="padding:8px">Nothing here.</div>') + '</div>'; }).join('') + '</div>';
+}
+function costSimHtml() {
+  if (!CONFIG.packs.costSim) return '';
+  const c = CONFIG.costs, th = TH(), rows = S.recs.filter(open).map(r => analyse(r)).filter(a => a.lane !== 'human');
+  const exp = T => { const auto = rows.filter(a => a.conf >= T && !a.conflict), wrong = auto.reduce((x, a) => x + c.errorK * (100 - a.conf) / 100, 0), rev = rows.length - auto.length; return { n: auto.length, wrong, cost: wrong * c.wrongPublish + rev * c.review }; };
+  const Ts = [70, 80, 90, 95], res = Ts.map(T => [T, exp(T)]), best = res.reduce((m, x) => x[1].cost < m[1].cost ? x : m);
+  return '<details ' + (ui.costOpen ? 'open' : '') + ' id="costsim"><summary><b>Cost of being wrong: choose the auto-verify threshold</b> <span class="badge b-sim">Illustrative model</span></summary><div class="row" style="margin:8px 0"><label>Cost of publishing a wrong entry ($) <input type="number" id="cWrong" min="0" value="' + c.wrongPublish + '"></label><label>Cost of one manual review ($) <input type="number" id="cRev" min="0" value="' + c.review + '"></label></div>'
+    + '<div class="tw"><table><thead><tr><th>Auto-verify at score ≥</th><th class="num">Auto-approved</th><th class="num">Expected wrong publishes</th><th class="num">Expected cost</th></tr></thead><tbody>' + res.map(([T, e]) => '<tr class="' + (T === best[0] ? 'diff' : '') + '"><td>' + T + (T === th.auto ? ' (current)' : '') + (T === best[0] ? ' · lowest expected cost' : '') + '</td><td class="num">' + e.n + '</td><td class="num">' + e.wrong.toFixed(2) + '</td><td class="num">$' + Math.round(e.cost) + '</td></tr>').join('') + '</tbody></table></div>'
+    + '<p class="small muted">Assumption, not data: chance an entry is wrong = ' + c.errorK + ' × (100 − score) ÷ 100. Change the costs and watch the best threshold move. Inspired by pricing false matches against missed matches in public entity-resolution work.</p></details>';
+}
+const ASKQ = [['overdue', 'Which entries are overdue?'], ['why', 'Why are exceptions open?'], ['gap', 'Where would removals open an access gap?'], ['push', 'What is waiting to be pushed?']];
+function askAnswer(k) {
+  const th = TH();
+  if (k === 'overdue') { const l = S.recs.filter(r => open(r) && daysSince(r) > th.cadenceDays); return l.length + ' open entries are past the ' + th.cadenceDays + '-day cadence. Oldest: ' + l.sort((a, b) => daysSince(b) - daysSince(a)).slice(0, 3).map(r => r.name + ' (' + daysSince(r) + ' d)').join(', ') + '.'; }
+  if (k === 'why') { const l = S.recs.filter(r => open(r) && analyse(r).lane === 'human'); return l.length ? l.length + ' exceptions: ' + l.map(r => { const a = analyse(r); return r.name + ' (' + (a.departure ? 'departure signal' : r.escalated ? 'escalated' : 'R3 ' + a.conf + ' below ' + th.low) + ')'; }).join('; ') + '.' : 'No open exceptions.'; }
+  if (k === 'gap') { const l = S.recs.filter(r => open(r) && analyse(r).departure && adequacy(r).gap); return l.length ? l.map(r => r.name + ': ' + r.spec + ' in ' + r.county + ' would drop to ' + adequacy(r).after).join('; ') + '.' : 'No pending removal opens a gap under the assumed standard of ' + CONFIG.minPerSpecCounty + '.'; }
+  const p = pending(); return p.length ? p.length + ' changes waiting: ' + p.slice(0, 4).map(r => r.name + ' (' + (r.push || 'update') + ')').join(', ') + (p.length > 4 ? ', and more' : '') + '.' : 'Nothing is waiting to be pushed.';
+}
+function askHtml() {
+  if (!CONFIG.packs.ask) return '';
+  return '<div class="card" style="margin-bottom:14px"><h3>Ask about this queue <span class="badge b-sim">Simulated assistant</span></h3><p class="muted small" style="margin:2px 0 8px">Rule-based answers computed from the current data. No live AI model is called.</p><div class="row">' + ASKQ.map(([k, q]) => '<button class="btn sm ' + (ui.ask === k ? 'on' : '') + '" data-act="ask" data-id="' + k + '" aria-pressed="' + (ui.ask === k) + '">' + q + '</button>').join('') + '</div>' + (ui.ask ? '<div class="banner ban-info" role="status" style="margin-bottom:0"><b>' + esc(ASKQ.find(x => x[0] === ui.ask)[1]) + '</b><br>' + esc(askAnswer(ui.ask)) + '</div>' : '') + '</div>';
+}
+function vExceptions() {
+  if (!S.loaded) return needData('exceptions', 'Exceptions');
+  const ex = S.recs.filter(r => open(r) && analyse(r).lane === 'human' && matchQ(r));
+  let out = phead('exceptions') + kpiStrip() + '<div class="card"><h3>Open exceptions</h3><p class="muted small">SLA: ' + TH().exceptionSLA + ' business days to first action; removal SLA ' + TH().removalSLA + ' business days from the flag.</p>';
+  if (!ex.length) return out + '<div class="banner ban-ok">No open exceptions match. (Empty state: nothing needs a human right now.)</div></div>';
+  out += '<div class="tw"><table><thead><tr><th>Provider</th><th>Why it is here</th><th>Owner</th><th class="num">Age (BD)</th><th>SLA</th><th>Action</th></tr></thead><tbody>' + ex.map(r => {
+    const a = analyse(r), age = S.simDay - (r.exceptionDay == null ? S.simDay : r.exceptionDay), od = age > TH().exceptionSLA;
+    const why = [a.departure ? 'Departure signal (' + a.claimsSilent + ' days without claims' + (a.boardInactive ? '; license inactive' : '; license active') + ')' : '', a.conf < TH().low ? 'R3 score ' + a.conf + ' below ' + TH().low : '', r.escalated ? 'Escalated by analyst' : ''].filter(Boolean).join('; ');
+    const due = r.flagDay != null && a.departure ? '<div class="small">Removal due ' + dateOf(r.flagDay + TH().removalSLA) + '</div>' : '';
+    return '<tr><td><b>' + esc(r.name) + '</b></td><td class="small">' + esc(why) + '</td><td><label class="sr" for="own-' + r.id + '">Owner for ' + esc(r.name) + '</label><select id="own-' + r.id + '" data-owner="' + r.id + '">' + CONFIG.owners.map(o => '<option ' + (o === r.owner ? 'selected' : '') + '>' + esc(o) + '</option>').join('') + '</select></td><td class="num">' + age + '</td><td>' + (od ? '<span class="badge b-bad">OVERDUE</span>' : '<span class="badge b-done">On time</span>') + due + '</td><td><button class="btn sm" data-act="openRec" data-id="' + r.id + '">Open ' + esc(r.name.replace('Dr. ', '')) + '</button></td></tr>';
+  }).join('') + '</tbody></table></div></div>';
+  return out;
+}
+
+function vDownstream() {
+  if (!S.loaded) return needData('downstream', 'Downstream push');
+  const pend = pending();
+  const rows = S.recs.filter(r => ['approved', 'removed', 'acked', 'removed_acked', 'rejected'].includes(r.stage) && matchQ(r));
+  let out = phead('downstream') + kpiStrip() + '<div class="card"><div class="row"><h3 style="flex:1">Push status <span class="badge b-sim">Simulated</span></h3><button class="btn primary" data-act="push" ' + (pend.length ? '' : 'disabled') + '>Push ' + pend.length + ' pending change' + (pend.length === 1 ? '' : 's') + '</button></div>'
+    + '<p class="small muted">Targets: Directory website and Facets (core admin). No real system is contacted.</p>';
+  if (!rows.length) return out + '<div class="banner ban-info">Nothing to push yet. Approve or remove records in Directory review first. (Empty state.)</div></div>';
+  out += '<div class="tw"><table><thead><tr><th>Provider</th><th>Change</th><th>Directory website</th><th>Facets</th><th>Status</th></tr></thead><tbody>' + rows.map(r => {
+    const chg = r.push || (r.stage === 'removed_acked' ? 'remove' : 'update');
+    const st = s => s === 'ack' ? '<span class="badge b-ready">✓ Acknowledged</span>' : s === 'rejected' ? '<span class="badge b-bad">✕ Rejected</span>' : '<span class="badge b-done">Pending</span>';
+    let extra = '';
+    if (r.stage === 'rejected') {
+      const v = ui.tax[r.id] != null ? ui.tax[r.id] : r.taxonomyCode;
+      extra = '<div class="banner ban-err" role="alert"><b>' + esc(r.ack.err) + '</b> The Directory website accepted the change; Facets did not, so this record is not counted as fresh.<div class="row" style="margin-top:6px"><label for="tx-' + r.id + '">Taxonomy code</label><input type="text" id="tx-' + r.id + '" data-tax="' + r.id + '" value="' + esc(v) + '" maxlength="12"><button class="btn primary sm" data-act="fix" data-id="' + r.id + '">Fix and retry</button></div>' + (ui.taxMsg[r.id] ? '<div class="small" style="color:var(--red)" role="alert">' + esc(ui.taxMsg[r.id]) + '</div>' : '') + '</div>';
+    }
+    return '<tr><td><b>' + esc(r.name) + '</b></td><td>' + esc(chg) + '</td><td>' + st(r.ack.dir) + '</td><td>' + st(r.ack.facets) + '</td><td>' + esc(STAGE_TXT[r.stage]) + extra + (r.stage === 'removed_acked' ? '<div style="margin-top:6px"><button class="btn danger sm" data-act="reinstate" data-id="' + r.id + '">Reinstate (undo removal)</button></div>' : '') + '</td></tr>';
+  }).join('') + '</tbody></table></div></div>';
+  return out;
+}
+
+function donut() {
+  const tot = S.recs.length; const gone = r => r.stage === 'removed' || r.stage === 'removed_acked';
+  const cats = [['Auto verified', '#7ab51d', S.recs.filter(r => !gone(r) && r.stage !== 'rejected' && r.autoApproved).length], ['Manually verified', '#e8b92f', S.recs.filter(r => !gone(r) && r.stage !== 'rejected' && r.approvedBy && !r.autoApproved).length],
+    ['Push rejected', '#d93b3b', S.recs.filter(r => r.stage === 'rejected').length], ['Removed', '#8a95a8', S.recs.filter(gone).length]];
+  cats.push(['In progress', '#ef7d12', tot - cats.reduce((a, c) => a + c[2], 0)]);
+  const R = 54, C = 2 * Math.PI * R; let off = 0, segs = '';
+  cats.forEach(c => { const len = tot ? C * c[2] / tot : 0; segs += '<circle r="' + R + '" cx="70" cy="70" fill="none" stroke="' + c[1] + '" stroke-width="20" stroke-dasharray="' + len + ' ' + (C - len) + '" stroke-dashoffset="' + (-off) + '"/>'; off += len; });
+  return '<div class="donutwrap" role="img" aria-label="Entries by status: ' + cats.map(c => c[0] + ' ' + c[2]).join(', ') + '"><svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true"><g transform="rotate(-90 70 70)">' + segs + '</g><text x="70" y="66" text-anchor="middle" font-size="9" fill="#465167">Total count</text><text x="70" y="84" text-anchor="middle" font-size="18" font-weight="800" fill="#072669">' + tot + '</text></svg><div class="legend">' + cats.map(c => '<div><i style="background:' + c[1] + '"></i><span>' + c[0] + '</span><b>' + c[2] + '</b></div>').join('') + '</div></div>';
+}
+function bar2(label, base, now, target, note) {
+  return '<div class="card"><h3>' + esc(label) + '</h3><div class="small muted">Baseline (at load) ' + fmtPct(base) + '</div><div class="bar2" aria-hidden="true"><i class="base" style="width:' + (base || 0) + '%"></i></div><div class="small"><b>Now ' + fmtPct(now) + '</b>' + (target != null ? ' · target ≥' + target + '%' : '') + '</div><div class="bar2" aria-hidden="true"><i style="width:' + (now || 0) + '%"></i></div><div class="small muted">' + esc(note) + '</div></div>';
+}
+function vScore() {
+  if (!S.loaded) return needData('score', 'Dashboard and audit');
+  const m = metrics(), b = S.baseline, T = CONFIG.targets;
+  let out = phead('score') + kpiStrip() + askHtml() + tileMap() + '<div class="row" style="margin-bottom:14px;gap:14px;align-items:center">' + donut()
+    + '<div class="pillstat"><span class="ic">' + svg('gauge') + '</span><span><div class="t">Median exception age</div><div class="v">' + (m.exMedian == null ? '–' : m.exMedian + ' BD') + '</div></span></div>'
+    + '<div class="pillstat"><span class="ic">' + svg('send') + '</span><span><div class="t">Downstream acknowledgement</div><div class="v">' + fmtPct(m.ackRate) + '</div></span></div></div>';
+  out += '<div class="grid g2">' + bar2('Verified-fresh rate (north star)', b.fresh, m.fresh, T.fresh, m.freshN + ' of ' + m.total + ' entries verified ≤' + TH().cadenceDays + ' days AND acknowledged downstream. ' + m.awaiting + ' verified but awaiting acknowledgement.')
+    + bar2('Audit-sample accuracy', b.accuracy, S.auditRun != null ? S.auditRun : null, T.accuracy, S.auditRun != null ? 'Correct published fields ÷ fields in the audit sample (every 2nd record, ' + auditSample().length + ' records).' : 'Not run yet. Click "Run audit sample" to compare published values with the synthetic ground truth.') + '</div>'
+    + '<div class="grid g4" style="margin-top:14px"><div class="kpi"><div class="l">Removal SLA (≤' + TH().removalSLA + ' BD), target ≥' + T.removalSLA + '%</div><div class="v">' + fmtPct(m.removalSLA) + '</div><div class="small muted">removals on time ÷ removals (' + m.removals + ')</div></div>'
+    + '<div class="kpi"><div class="l">Auto-verify rate</div><div class="v">' + fmtPct(m.autoRate) + '</div><div class="small muted">auto-approved ÷ all approvals (' + m.approvals + ')</div></div>'
+    + '<div class="kpi"><div class="l">Exception age, target ≤' + T.exceptionAge + ' BD</div><div class="v">' + (m.exMedian == null ? '–' : m.exMedian) + '</div><div class="small muted">median business days, open exceptions (' + m.exOpen + ')</div></div>'
+    + '<div class="kpi"><div class="l">Downstream acknowledgement</div><div class="v">' + fmtPct(m.ackRate) + '</div><div class="small muted">acknowledged ÷ pushed (' + m.pushed + ')</div></div></div>'
+    + '<div class="row" style="margin:14px 0"><button class="btn primary" data-act="audit">Run audit sample</button><span class="small muted">' + esc(ui.auditMsg) + '</span></div>';
+  out += '<div class="card"><div class="row"><h3 style="flex:1">Audit log (' + S.audit.length + ')</h3><button class="btn sm" data-act="copyAudit">Copy log as CSV</button></div><p class="small muted">Every change records who, what, why and when (simulated clock). Downloads are not available in this view, so use Copy.</p>'
+    + '<div class="tw" style="max-height:340px"><table><thead><tr><th class="num">#</th><th>When</th><th>Action</th><th>Provider</th><th>Reason</th><th>Detail</th></tr></thead><tbody>' + S.audit.map(e => '<tr><td class="num">' + e.n + '</td><td class="small">' + esc(e.date) + '</td><td>' + esc(e.action) + '</td><td>' + esc(e.name) + '</td><td class="small">' + esc(e.reason) + '</td><td class="small">' + esc(e.detail) + '</td></tr>').join('') + '</tbody></table></div></div>';
+  return out;
+}
+
+function r3bars(a) {
+  const b = (l, v) => '<div><span>' + l + '</span><span class="bar2" aria-hidden="true"><i style="width:' + Math.round(v * 100) + '%"></i></span><b>' + Math.round(v * 100) + '</b></div>';
+  return '<div class="r3" aria-label="R3 score breakdown">' + b('Reliability', a.reliab) + b('Relevance', a.agree) + b('Recency', a.recency) + '</div>';
+}
+function vDrawer() { return ui.tab === 'queue' && S.loaded ? '' : vRec(false); }
+function vRec(inl, rid) {
+  const r = rec(rid || ui.open); if (!r) return '';
+  const a = analyse(r), th = TH(), sel = selections(r, a), msg = ui.drawerMsg, days = daysSince(r);
+  let h = (inl ? '<section class="ws" aria-label="Record workspace">' : '<div class="scrim" data-act="closeRec"></div><aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle">') + '<div class="eyebrow">' + svg('arrow') + 'Record review</div><div class="row"><h2 id="dTitle" tabindex="-1" style="flex:1;font-size:1.4rem">' + esc(r.name) + '</h2>' + (inl ? '<button class="btn sm" data-act="next">Next record →</button>' : '<button class="btn sm" data-act="closeRec">Close (Esc)</button>') + '</div>'
+    + '<div class="small muted">' + esc(r.spec) + ' · ' + esc(r.county) + ' County · NPI ' + esc(r.id) + ' (synthetic)</div>'
+    + '<div class="row" style="margin:10px 0"><span class="badge ' + (days > th.cadenceDays ? 'b-bad' : 'b-ready') + '">Last verified ' + days + ' days ago' + (days > th.cadenceDays ? ' (overdue)' : '') + '</span><span class="badge b-outreach">R3 score ' + a.conf + ' / 100</span>' + laneBadge(a.lane) + '</div>';
+  if (msg) h += '<div class="banner ' + ({ err: 'ban-err', ok: 'ban-ok', warn: 'ban-warn', info: 'ban-info' }[msg.t]) + '" role="' + (msg.t === 'err' ? 'alert' : 'status') + '">' + esc(msg.m) + '</div>';
+  if (!open(r)) {
+    return h + '<div class="banner ban-info">Status: ' + esc(STAGE_TXT[r.stage]) + '. ' + (r.stage === 'removed_acked' || r.stage === 'removed' ? 'If this removal was a mistake, reinstate it.' : 'See Downstream push.') + '</div>'
+      + (r.stage === 'removed_acked' || r.stage === 'removed' ? '<button class="btn danger" data-act="reinstate" data-id="' + r.id + '">Reinstate (undo removal)</button>' : '') + '' + (inl ? '</section>' : '</aside>');
+  }
+  if (a.departure) h += '<div class="banner ' + (a.boardInactive ? 'ban-err' : 'ban-warn') + '"><b>⚑ Departure signal.</b> No claims for ' + a.claimsSilent + ' days; state license ' + (a.boardInactive ? '<b>inactive</b>. Removal is supported by the evidence but still needs your approval (5-business-day clock' + (r.flagDay != null ? ', due ' + dateOf(r.flagDay + th.removalSLA) : '') + ').' : '<b>active</b>. Verify with the provider before any removal.') + '</div>';
+  h += checksHtml(r, a);
+  if (CONFIG.packs.adequacy && a.departure) { const q = adequacy(r); h += '<div class="banner ' + (q.gap ? 'ban-err' : 'ban-ok') + '"><b>Adequacy impact (simulated geography).</b> ' + esc(r.spec) + ' in ' + esc(r.county) + ' County would go from ' + q.before + ' to ' + q.after + ' active provider' + (q.after === 1 ? '' : 's') + '; the assumed standard is ' + q.min + '. ' + (q.gap ? '<b>Removing this provider opens an access gap.</b> Recruit or confirm another provider before the removal clock runs out.' : 'No gap opens.') + '</div>'; }
+  h += '<h3>Evidence by source</h3><div class="tw"><table><thead><tr><th>Field</th>' + Object.keys(r.src).map(k => '<th>' + esc(CONFIG.sources[k].label) + '<div class="small" style="font-weight:500;text-transform:none;letter-spacing:0">' + (S.simDay - r.src[k].day) + ' d old</div></th>').join('') + '</tr></thead><tbody>'
+    + CONFIG.fields.map(f => '<tr><td><b>' + esc(f.label) + '</b></td>' + Object.keys(r.src).map(k => { const v = r.src[k][f.key]; const diff = v != null && a.fields[f.key].conflict && !eqv(f.key, v, a.winners[f.key]); return '<td class="' + (diff ? 'diff' : '') + '">' + (v == null ? '<span class="muted">not stated</span>' : esc(v)) + (diff ? '<div class="small"><b>⚠ differs from winner</b></div>' : '') + '</td>'; }).join('') + '</tr>').join('') + '</tbody></table></div>'
+    + '<h3 style="margin-top:12px">R3 score breakdown</h3>' + r3bars(a)
+    + '<p class="small muted">Score ' + a.conf + ' = 50% relevance + 25% reliability + 25% recency. Source weights: ' + Object.entries(CONFIG.sources).map(([k, v]) => v.label + ' ' + v.w).join(', ') + '. Rule-computed, not a live model. Fresh agreeing sources: ' + a.freshAgree + '.</p>';
+  h += '<h3>Values to publish</h3>' + CONFIG.fields.map(f => '<fieldset><legend>' + esc(f.label) + (a.fields[f.key].conflict ? ' (sources disagree)' : '') + '</legend>' + (a.fields[f.key].groups.length ? a.fields[f.key].groups.map((g, i) => '<label class="opt"><input type="radio" name="sel-' + f.key + '" data-sel="' + f.key + '" value="' + esc(g.val) + '" ' + (sel[f.key] === g.val ? 'checked' : '') + '> ' + esc(g.val) + ' <span class="small muted">(' + g.srcs.map(s => CONFIG.sources[s].label).join(', ') + (i === 0 ? '; recommended' : '') + ')</span></label>').join('') : '<span class="muted small">No evidence for this field. Current listing stays: ' + esc(r.published[f.key]) + '</span>') + (r.published[f.key] != null ? '<div class="small muted">Currently published: ' + esc(r.published[f.key]) + '</div>' : '') + '</fieldset>').join('');
+  const o = r.outreach;
+  h += '<h3>Outreach <span class="badge b-sim">Simulated</span></h3><div class="row"><button class="btn sm" data-act="outreach" data-id="' + r.id + '" ' + (o ? 'disabled' : '') + '>Send outreach (phone)</button><button class="btn sm" data-act="reply" data-id="' + r.id + '" ' + (!o || o.status !== 'sent' ? 'disabled' : '') + '>Simulate provider reply</button></div><div class="small muted">' + (o ? 'Status: ' + esc(o.status) + (o.status === 'sent' ? ' · due ' + dateOf(o.sentDay + th.outreachSLA) : '') : 'No outreach yet. No real call is placed in this demo.') + '</div>';
+  h += '<h3 style="margin-top:14px">Decision</h3><div class="row"><label for="reason">Reason code</label><select id="reason"><option value="">Select…</option>' + CONFIG.reasonCodes.map(c => '<option value="' + c.code + '" ' + (ui.reason === c.code ? 'selected' : '') + '>' + esc(c.code + ' ' + c.label) + '</option>').join('') + '</select></div>'
+    + '<div class="row" style="margin:10px 0"><button class="btn primary" data-act="approve" data-id="' + r.id + '">Approve selected values</button><button class="btn" data-act="escalate" data-id="' + r.id + '">Escalate</button></div>';
+  if (a.departure) h += '<fieldset><legend>Remove from directory (human approval)</legend><label class="opt"><input type="checkbox" id="rmTick" ' + (ui.rmTick ? 'checked' : '') + '> I reviewed the license and claims evidence and confirm this provider has left the network.</label><button class="btn danger sm" data-act="remove" data-id="' + r.id + '">Remove (needs reason R6)</button></fieldset>';
+  return h + '' + (inl ? '</section>' : '</aside>');
+}
+
+function render() {
+  const cur = TABS.find(t => t[0] === ui.tab);
+  $('#crumb').innerHTML = esc(CONFIG.caseName.replace(' Directory Command Center', '')) + ' Health Plan <span>(demo tenant) / ' + esc(cur[1]) + '</span>';
+  $('#clock').innerHTML = '<span>Sim. date: <b>' + esc(dateOf(S.simDay)) + '</b> (day ' + S.simDay + ')</span><button class="btn sm" data-act="advance" ' + (S.loaded ? '' : 'disabled') + '>Advance 1 business day</button><button class="btn sm" data-act="reset">Reset</button>';
+  if (S.loaded) sync();
+  const counts = S.loaded ? { queue: S.recs.filter(open).length, exceptions: S.recs.filter(r => open(r) && analyse(r).lane === 'human').length, downstream: pending().length } : {};
+  $('#tabs').innerHTML = TABS.map(([k, l, ic]) => '<button role="tab" id="tab-' + k + '" aria-selected="' + (ui.tab === k) + '" data-act="tab" data-id="' + k + '">' + svg(ic) + l + (counts[k] ? '<span class="num" aria-label="' + counts[k] + ' items">' + counts[k] + '</span>' : '') + '</button>').join('');
+  const v = { ingest: vIngest, queue: vQueue, exceptions: vExceptions, downstream: vDownstream, score: vScore }[ui.tab];
+  $('#app').innerHTML = '<div role="tabpanel" aria-labelledby="tab-' + ui.tab + '">' + v() + '</div>';
+  $('#drawerHost').innerHTML = vDrawer();
+  $('#foot').textContent = 'Practice prototype for a HiLabs-style case, modelled on HiLabs\' public product style and not an official HiLabs product. All people, NPIs, addresses and phone numbers are fictional. Scoring is rule-computed from CONFIG; outreach and downstream systems are simulated. Session-only state.';
+}
+
+/* ============================ events ============================ */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const act = t.dataset.act, id = t.dataset.id; lastTrigger = t;
+  let focusSel = '[data-act="' + act + '"]' + (id ? '[data-id="' + id + '"]' : '');
+  switch (act) {
+    case 'tab': ui.tab = id; ui.open = null; ui.drawerMsg = null; ui.bulkMsg = null; focusSel = '#tab-' + id; break;
+    case 'load': ingest('ok'); return;
+    case 'loadBad': ingest('bad'); return;
+    case 'loadEmpty': ingest('empty'); return;
+    case 'advance': S.simDay++; log('Simulated clock advanced', null, '', 'Day ' + S.simDay + ' (' + dateOf(S.simDay) + ')'); toast('Advanced to ' + dateOf(S.simDay) + '. Evidence is one day older; timers moved.'); break;
+    case 'reset': Object.assign(CONFIG.thresholds, TH0); Object.assign(CONFIG.costs, { wrongPublish: 150, review: 12 }); ui.costOpen = false; ui.ask = null; S = freshState(); ui = { tab: 'ingest', open: null, lane: 'all', loading: false, ingest: null, drawerMsg: null, bulk: false, bulkMsg: null, sel: {}, tax: {}, taxMsg: {}, auditMsg: '', filterQ: '' }; $('#q').value = ''; toast('Reset to the initial state.'); focusSel = '#tab-ingest'; break;
+    case 'next': { const l = S.recs.filter(r => open(r) && (ui.lane === 'all' || analyse(r).lane === ui.lane) && matchQ(r)); const k = l.findIndex(r => r.id === ui.open); const n = l[k + 1] || l[0]; if (n) { ui.open = n.id; ui.drawerMsg = null; ui.reason = ''; ui.rmTick = false; } focusSel = '#dTitle'; break; }
+    case 'qview': ui.qview = id; break;
+    case 'boardOpen': ui.qview = 'inbox'; ui.lane = 'all'; ui.open = id; ui.drawerMsg = null; ui.reason = ''; ui.rmTick = false; focusSel = '#dTitle'; break;
+    case 'ask': ui.ask = ui.ask === id ? null : id; break;
+    case 'lane': ui.lane = id; break;
+    case 'openRec': ui.open = id; ui.drawerMsg = null; ui.reason = ''; ui.rmTick = false; focusSel = '#dTitle'; break;
+    case 'closeRec': focusSel = ui.open ? '[data-act="openRec"][data-id="' + ui.open + '"]' : null; ui.open = null; ui.drawerMsg = null; break;
+    case 'bulkOpen': ui.qaTick = false; ui.bulk = true; ui.bulkMsg = null; ui.bulkErr = ''; break;
+    case 'bulkCancel': ui.bulk = false; break;
+    case 'bulkConfirm': ui.qaTick = $('#qaTick').checked; if (!ui.qaTick) { ui.bulkErr = 'Tick the box to confirm you spot-checked the sample. Nothing was approved.'; break; } bulkApprove(); ui.open = null; focusSel = '#app'; break;
+    case 'outreach': doOutreach(id); focusSel = '#dTitle'; break;
+    case 'reply': doReply(id); focusSel = '#dTitle'; break;
+    case 'approve': ui.reason = $('#reason').value; doApprove(id, ui.reason); focusSel = ui.open ? '#dTitle' : '#app'; break;
+    case 'escalate': doEscalate(id); focusSel = '#app'; break;
+    case 'remove': ui.reason = $('#reason').value; ui.rmTick = $('#rmTick').checked; doRemove(id, ui.reason, ui.rmTick); focusSel = ui.open ? '#dTitle' : '#app'; break;
+    case 'reinstate': doReinstate(id); focusSel = '#app'; break;
+    case 'push': { const n = pushAll(); toast(n + ' change' + (n === 1 ? '' : 's') + ' pushed (simulated). Check acknowledgements.'); break; }
+    case 'fix': ui.tax[id] = $('#tx-' + id).value; fixRetry(id); break;
+    case 'audit': S.auditRun = auditAccuracy(); ui.auditMsg = 'Audit sample run on day ' + S.simDay + ': ' + S.auditRun + '% of sampled fields match the synthetic ground truth.'; log('Audit sample run', null, '', S.auditRun + '% accuracy on ' + auditSample().length + ' records'); say(ui.auditMsg); break;
+    case 'copyAudit': {
+      const csv = ['n,date,actor,action,npi,provider,reason,detail'].concat(S.audit.map(x => [x.n, x.date, x.actor, x.action, x.id, x.name, x.reason, x.detail].map(c => '"' + String(c).replace(/"/g, '""') + '"').join(','))).join('\n');
+      const done = ok => { ui.auditMsg = ok ? 'Audit log copied as CSV (' + S.audit.length + ' rows).' : 'Copy was blocked in this view. Select the table text and copy it manually.'; render(); say(ui.auditMsg); };
+      try { navigator.clipboard.writeText(csv).then(() => done(true), () => done(false)); } catch (er) { done(false); }
+      return;
+    }
+  }
+  if (ui.tab === 'queue' && S.loaded && ['approve', 'remove'].includes(act) && ui.open && rec(ui.open) && !open(rec(ui.open)) && !(ui.drawerMsg && ui.drawerMsg.t === 'err')) { const l = S.recs.filter(r => open(r) && (ui.lane === 'all' || analyse(r).lane === ui.lane) && matchQ(r)); const n = l[0]; if (n) { const m = ui.drawerMsg; ui.open = n.id; ui.reason = ''; ui.rmTick = false; ui.drawerMsg = m; } }
+  render();
+  if (focusSel) { const el = document.querySelector(focusSel); if (el) el.focus(); }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.sel) { const r = rec(ui.open); ui.sel[r.id] = Object.assign({}, ui.sel[r.id], { [t.dataset.sel]: t.value }); }
+  else if (t.dataset.owner) { const r = rec(t.dataset.owner); r.owner = t.value; log('Owner changed', r, '', t.value); say('Owner set to ' + t.value); }
+  else if (t.id === 'reason') ui.reason = t.value;
+  else if (t.id === 'rmTick') ui.rmTick = t.checked;
+  else if (t.id === 'qaTick') ui.qaTick = t.checked;
+  else if (t.id === 'cWrong' || t.id === 'cRev') { if (t.id === 'cWrong') CONFIG.costs.wrongPublish = Math.max(0, Number(t.value) || 0); else CONFIG.costs.review = Math.max(0, Number(t.value) || 0); ui.costOpen = true; clearTimeout(ui.rt); ui.rt = setTimeout(render, 220); }
+  else if (t.id === 'thAuto' || t.id === 'thLow' || t.id === 'thCad') {
+    const th = CONFIG.thresholds, v = Number(t.value);
+    if (t.id === 'thAuto') th.auto = Math.max(50, Math.min(100, v)); if (t.id === 'thLow') th.low = Math.max(0, Math.min(th.auto - 1, v)); if (t.id === 'thCad') th.cadenceDays = Math.max(30, Math.min(365, v));
+    log('Rule changed', null, 'R5 Analyst override of lane', 'auto ' + th.auto + ', low ' + th.low + ', cadence ' + th.cadenceDays); ui.rulesOpen = true; clearTimeout(ui.rt); ui.rt = setTimeout(() => { render(); say('Lanes recomputed with the new rules.'); }, 220);
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.dataset.tax) ui.tax[e.target.dataset.tax] = e.target.value;
+  else if (e.target.id === 'q') { ui.filterQ = e.target.value; if (S.loaded && ui.tab !== 'queue' && ui.tab !== 'exceptions' && ui.tab !== 'downstream') ui.tab = 'queue'; render(); }
+});
+document.addEventListener('keydown', e => {
+  if (ui.tab === 'queue' && S.loaded && !e.ctrlKey && !e.metaKey && !e.altKey && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) {
+    const k = e.key.toLowerCase(), sel = { a: '[data-act="approve"]', o: '[data-act="outreach"]', e: '[data-act="escalate"]' }[k];
+    if (k === 'j' || k === 'k') { const rows = [...document.querySelectorAll('.irow')]; const i = rows.findIndex(x => x.classList.contains('sel')); const t = rows[Math.max(0, Math.min(rows.length - 1, i + (k === 'j' ? 1 : -1)))]; if (t) t.click(); e.preventDefault(); return; }
+    if (sel) { const b = document.querySelector('.ws ' + sel); if (b && !b.disabled) { b.click(); e.preventDefault(); } return; }
+  }
+  if (e.key === 'Escape' && ui.open && !(ui.tab === 'queue' && S.loaded)) { const id = ui.open; ui.open = null; ui.drawerMsg = null; render(); const b = document.querySelector('[data-act="openRec"][data-id="' + id + '"]'); if (b) b.focus(); } });
+render();
+</script>
+</body>
+</html>
